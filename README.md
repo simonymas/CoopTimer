@@ -1,5 +1,5 @@
 # cooptimer
-/* TIME CONTROLLER PROGRAM
+/* TIME CONTROLLER PROGRAM - cooptimer
 
 Created by Simon Nyrup Madsen 2014-2020 - simon.nyrup@gmail.com
 
