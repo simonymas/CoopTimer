@@ -1,24 +1,3 @@
-/* TIME CONTROLLER PROGRAM
-
-This program is designes to control relays on the basis of timers and manual inputs on a keypad.
-
-Its features includes:
- * Timekeeping and setting timers
- * Calculation of todays sunset and sunrise for automatic timekeeping
- * Control of 8 relays
- * Keypad and display for manual control.
-
-In this version, the program is designed to manage a chicken coop with automatic lights as well as doors and nests operated by lineary actuators.
-
-Hardware set-up:
- *  Arduino Uno/Mega (Disable code for the board, that is not relevant to you)
- *  Clock-mocule DS3231 (Insert rechargeable battery LIR2032. Connect to SCL and SDA on Arduino and supplied from 3.3 V outlet and GND on Arduino)
- *  Relay-module (Connect to GND on arduino on pin side - but with seperate GND and power supply to VCC-JD)
- *  LCD Keypad Shield
- *  Temperature sensor S18B20 (Currently disabled in code)
- *  Lineary actuators
-*/
-
 //INCLUSION OF LIBRARIES - libraries compatible with Arduino IDE 1.6.1
 
   //  I2C connection
@@ -35,6 +14,9 @@ Hardware set-up:
   //  LCD display
       #include  <LiquidCrystal.h> //Included in Arduino IDE folder
       
+  //  EEPROM to save settings to non-volatile memory on the board
+      #include <EEPROM.h>
+  
   //  Watchdog to reset
       #include <avr/wdt.h>
 
@@ -76,7 +58,37 @@ Hardware set-up:
       //RTC_SCL; - asigned by Wire library
       //GND
       //3,3V
-            
+
+//DISTRIBUTION OF EEPROM ADRESSES
+  //  Eeprom-update
+      #define Eeprom_status_address           0 
+      
+  //  Light
+      #define LightOnMorning_set_address      1
+      #define LightOnMorning_hour_address     2
+      #define LightOnMorning_minute_address   3
+      #define LightOffMorning_set_address     4
+      #define LightOffMorning_hour_address    5
+      #define LightOffMorning_minute_address  6
+      #define TimeWithLight_hour_address      7
+      #define TimeWithLight_minute_address    8
+      
+  //  Door
+      #define DoorOpen_set_address            9
+      #define DoorOpen_hour_address          10
+      #define DoorOpen_minute_address        11 
+      #define DoorClose_set_address          12
+      #define DoorClose_hour_address         13
+      #define DoorClose_minute_address       14   
+      
+  //  Nest
+      #define NestOpen_set_address           15
+      #define NestOpen_hour_address          16
+      #define NestOpen_minute_address        17
+      #define NestClose_set_address          18
+      #define NestClose_hour_address         19
+      #define NestClose_minute_address       20    
+
 //SETTINGS
     
   //  Activate debugging messages in serial screen - set to true to debug (Warning: if all is activated, dynamic memory will overload)
@@ -86,52 +98,60 @@ Hardware set-up:
       const bool SerialDebugTimers = true;
       const bool SerialDebugStatus = false;
       
-  //  Timers     
-      //Light        
-      const byte LightOnMorning_set = 3; // Values: 1 = Time set below, 0 = Time set automatically to turn on in the morning and evening if needed (using TimeWithLight_hours), 2 = Disabled - turn on manually, 3 = Time set automatically to turn on only in the morning if needed
-      const byte LightOnMorning_hour = 6;
-      const byte LightOnMorning_minute = 37;
+  //  Constants and preset values for timer-variables (values used, when nothing has yet been saved in EEPROM, or if code overwriting EEPROM status variable is activated in setup-routine)
       
-      const byte LightOffMorning_set = 1; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
-      const byte LightOffMorning_hour = 15;
-      const byte LightOffMorning_minute = 00;
-      const int LightOffDelayAfterSunRise_minutes = 30; // Used if timer is set automatically
+      //Light
+      #define LightOnMorning_set_preset     0 // Values: 1 = Time set below, 0 = Time set automatically to turn on in the morning if needed (using TimeWithLight_hours), 2 = Disabled - turn on manually
+      #define LightOnMorning_hour_preset    5
+      #define LightOnMorning_minute_preset  30
 
+      #define LightOffMorning_set_preset    0 // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
+      #define LightOffMorning_hour_preset   9
+      #define LightOffMorning_minute_preset 00
+      
+      const int LightOffDelayAfterSunRise_minutes = 30; // Used if timer is set automatically
+            
+      #define TimeWithLight_hour_preset    12
+      #define TimeWithLight_minute_preset   00
+      
       const byte LightOnEvening_set = 2; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn on manually
       const byte LightOnEvening_hour = 20;
       const byte LightOnEvening_minute = 30;
       
-      const byte LightOffEvening_set = 0; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
+      const byte LightOffEvening_set = 2; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
       const byte LightOffEvening_hour = 21;
       const byte LightOffEvening_minute = 55;
-      const int LightOnDelayAfterSunSet_minutes = -5; // Used if timer is set automatically
       
-      const byte TimeWithLight_hours = 12;
+      const int LightOnDelayAfterSunSet_minutes = -15; // Used if timer is set automatically
       
       //Door
-      const byte DoorOpen_set = 0; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - open manually
-      const byte DoorOpen_hour = 6;
-      const byte DoorOpen_minute = 30;
+      #define DoorOpen_set_preset     0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - open manually
+      #define DoorOpen_hour_preset    6
+      #define DoorOpen_minute_preset  30
+  
       const int DoorOpenDelayAfterSunRise_minutes = -15; // Used if timer is set automatically - delay after sun has risen
-          
-      const byte DoorClose_set = 0; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
-      const byte DoorClose_hour = 17;
-      const byte DoorClose_minute = 17;
+
+      #define DoorClose_set_preset    0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
+      #define DoorClose_hour_preset   17
+      #define DoorClose_minute_preset 17    
+                
       const int DoorCloseDelayAfterCivilTwilight_minutes = 20; // Used if timer is set automatically. Civil twilight is 37-62 minutes after sunset at altitude of Denmark - less at 23 of october and december,and more at 23 rd of june and december
       
       const int DoorOpenProcessing_seconds = 40; //Time to open fully, when door is fully closed
       const int DoorCloseProcessing_seconds = 80; //Time to close door
       
       //Nest
-      const byte NestOpen_set = 0; // Values: 1 = Time set below, 0 = Time set automatically (at time of light), 2 = Disabled - open manually
-      const byte NestOpen_hour = 5;
-      const byte NestOpen_minute = 00;
+      #define NestOpen_set_preset     0   // Values: 1 = Time set below, 0 = Time set automatically (at time of light), 2 = Disabled - open manually
+      #define NestOpen_hour_preset    5
+      #define NestOpen_minute_preset  0 
+      
       const int NestOpenDelayAfterCivilTwilight_minutes = 0; // Used if timer is set automatically - delay after the minimum amount of light set has tuned on - or civil twilight, if this is earlier
 
-      const byte NestClose_set = 1; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
-      const byte NestClose_hour = 16;
-      const byte NestClose_minute = 15;
-      const int NestCloseDelayAfterDoorClose_minutes = -30; // Used if timer is set automatically - time to wait to close nests after doors have closed
+      #define NestClose_set_preset    1   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
+      #define NestClose_hour_preset   14
+      #define NestClose_minute_preset 30
+      
+      const int NestCloseDelayAfterDoorClose_minutes = -60; // Used if timer is set automatically - time to wait to close nests after doors have closed
       
       const int NestOpenProcessing_seconds = 30; //Time to run open routine 
       const int NestCloseProcessing_seconds = 30; //Time to run close routine
@@ -140,64 +160,84 @@ Hardware set-up:
       const float Lattitude = 55.783748, Longitude = 11.939181; //Currently set to position of Skibby, Denmark - change if location is changed - and change values for civil twilight in setup_sun()!
 
   //  Intensity of backgrund light on reset - set a number between 0 and 255
-      const int DisplayLightIntensity = 190;
+      const int DisplayLightIntensity = 120;
 
-        
-//DEFINITION OF SOME VARIABLES AND VALUES FOR THE FUNCTIONS - donn't change
-  
-  //  Variable to determine, if DST is set. Values: 1 = DST is activated, 0 = Normal time is activated - always set to 0 at startup
-      byte DST = 0;
-      
-  //  Variables used in checks
-      int LightStatus = 0; //Values: 0 = No light nedded; 1 = Morning light has not been turned on yet, 2 = Morning light is turned on, 3 = Morning light has been turned off, 4 = Evening light is turned on)
-      int DoorStatus = 0; //Values: 0 = Not set; 1 = Closed; 2 = Opening; 3 = Open; 4 = Closing - See explanation in Check_door_status
-      int NestStatus = 0; //Values: 0 = Not set; 1 = Closed; 2 = Opening; 3 = Open; 4 = Closing
-      
-      byte DoorActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
-      byte NestActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
-      
-      int  TimeWithElectricLight_seconds; //Calculation in Setup_light_timer;
-      
-  //  Time_t numbers
-      time_t ResetTime_t;
-      
-      time_t TodaysSunRise_t; //Calculated in Setup_sun();
+  //  KeyPad and display fuctions
+      int  SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
+      int MenuReset = 50; // Seconds before menu exits,so loop can continue. If value is to high, system will reset (don´t know why...)
+
+//DECLARATION OF SOME GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
+  //  Calculated in Setup_sun()
+      time_t TodaysSunRise_t; 
       time_t TodaysSunSet_t;
       time_t TodaysCivilTwilightMorning_t;
       time_t TodaysCivilTwilightEvening_t;
-          
+
+  //  Calculated in Setup_timer()   
+      int TimeWithElectricLight_seconds;
       time_t LightOnMorning_t; 
       time_t LightOffMorning_t;
       time_t LightOnEvening_t;
       time_t LightOffEvening_t;
-               
       time_t DoorOpen_t;
       time_t DoorClose_t;
-      
       time_t NestOpen_t;
       time_t NestClose_t;
 
-      time_t MenuReset_t;
-               
-  //  Temperature
-      /*
-      OneWire oneWire(Temp_PWM); 
-      DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
-      float temp = sensors.getTempCByIndex(0);
-      */
-       
-  //  KeyPad and display fuctions
+  //  Calcultated in Input_keypad();
+      time_t Adjusted_time;
+
+  //  Define global variables and read values from EEPROM
+      //Eeprom-update
+      byte Eeprom_status = EEPROM.read(Eeprom_status_address);
+      
+      //Light           
+      byte LightOnMorning_set = EEPROM.read(LightOnMorning_set_address);
+      byte LightOnMorning_hour = EEPROM.read(LightOnMorning_hour_address);
+      byte LightOnMorning_minute = EEPROM.read(LightOnMorning_minute_address);
+      
+      byte LightOffMorning_set = EEPROM.read(LightOffMorning_set_address);
+      byte LightOffMorning_hour = EEPROM.read(LightOffMorning_hour_address);
+      byte LightOffMorning_minute = EEPROM.read(LightOffMorning_minute_address);
+      
+      byte TimeWithLight_hour = EEPROM.read(TimeWithLight_hour_address);
+      byte TimeWithLight_minute = EEPROM.read(TimeWithLight_minute_address);
+      
+      //Door
+      byte DoorOpen_set = EEPROM.read(DoorOpen_set_address);
+      byte DoorOpen_hour = EEPROM.read(DoorOpen_hour_address);
+      byte DoorOpen_minute = EEPROM.read(DoorOpen_minute_address);
+          
+      byte DoorClose_set = EEPROM.read(DoorClose_set_address);
+      byte DoorClose_hour = EEPROM.read(DoorClose_hour_address);
+      byte DoorClose_minute = EEPROM.read(DoorClose_minute_address);
+      
+      //Nest
+      byte NestOpen_set = EEPROM.read(NestOpen_set_address);
+      byte NestOpen_hour = EEPROM.read(NestOpen_hour_address);
+      byte NestOpen_minute = EEPROM.read(NestOpen_minute_address);
+
+      byte NestClose_set = EEPROM.read(NestClose_set_address);
+      byte NestClose_hour = EEPROM.read(NestClose_hour_address);
+      byte NestClose_minute = EEPROM.read(NestClose_minute_address);
+
+  //  Used in Input_keypad and Display_menu functions
       int KeyStatus = 0;
-      int KeyValue = 0;
-            
+      int KeyValue = 0;     
       byte Pos = 11;
       byte Cur = 2;
+      byte CurSelect = 0;
       byte PosLast = 0;
       byte CurDel = 2;
-
       byte Line = 0;
-      int  SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
-      int MenuReset = 30; // Seconds before menu exits,so loop can continue. If value is to high, system will resets (don´t know why...)
+      byte ValueChanged =0;
+
+  //  From Setup_reset functions
+      time_t ResetTime_t;
+      time_t MenuReset_t;
+
+  //  Variable to determine, if DST is set. Values: 1 = DST is activated, 0 = Normal time is activated - always set to 0 at startup
+      byte DST = 0;
 
 //SETUP ROUTINE - runs only once    
 void setup()
@@ -218,9 +258,13 @@ void setup()
       //sensors.begin();
       
   //  Upload initial time on DS3231 - after setting time, disable line in code and upload again - otherwise the time will be reset to the time entered below every time arduino resets!
-      //Setup_time_initial(00,10,9,3,3,11,20); // Key: (seconds, minutes, hours, weekday (1=Sunday, 7=Saturday), date, month, year)
+      //Setup_time_initial(00,4,0,1,30,11,20); // Key: (seconds, minutes, hours, weekday (1=Sunday, 7=Saturday), date, month, year)
       //ALWAYS SET TO NORMAL TIME, NOT TAKING DAYLIGHT SAVING TIME INTO ACCOUNT - in between last sunday of march and last sunday of october, one hour should be substracted from time on your watch
                
+  //  Get values from EEPROM
+      //Eeprom_status = 0; // Force EEPROM to reset to preset values above  - Values of adress 0: 1 = eeprom is updated, 0 = Save preset values agian - RESTART to have them loaded into RAM 2 = Update EPROM new time-values set by Keypad
+      Setup_eeprom();
+  
   //  Sync time from DS3231
       Setup_time_sync();
   

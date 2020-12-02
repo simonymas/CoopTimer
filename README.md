@@ -1,7 +1,7 @@
 # cooptimer
 /* TIME CONTROLLER PROGRAM - cooptimer
 
-Created by Simon Nyrup Madsen 2014-2020 - simon.nyrup@gmail.com
+Created by Simon Nyrup Madsen 2014 - 2020 - simon.nyrup@gmail.com
 
 This program is designes to control relays on the basis of timers and manual inputs on a keypad.
 
@@ -9,7 +9,7 @@ Its features includes:
  * Timekeeping and setting timers
  * Calculation of todays sunset and sunrise for automatic timekeeping
  * Control of 8 relays
- * Keypad and display for manual control.
+ * Keypad and display for manual control and for chaning settings.
 
 In this version, the program is designed to manage a chicken coop with automatic lights as well as doors and nests operated by lineary actuators.
 
@@ -19,5 +19,10 @@ Hardware set-up:
  *  Relay-module (Connect to GND on arduino on pin side - but with seperate GND and power supply to VCC-JD)
  *  LCD Keypad Shield
  *  Temperature sensor S18B20 (Currently disabled in code)
- *  Lineary actuators
+ *  Lineary actuators.
+
+Version notes v1.0
+ *  This is the base-line version of the program.
+
+
 */

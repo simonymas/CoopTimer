@@ -33,7 +33,7 @@
       {if (SerialDebugDisplay){Serial.println();Serial.print("Display_time()");}}
 
       void Display_Input_keypad_serial()
-      {if (SerialDebugDisplay){Serial.println();Serial.print("Input_keypad() - KeyStatus = ");Serial.print(KeyStatus);Serial.print(" Pos = ");Serial.print(Pos);}}
+      {if (SerialDebugDisplay){Serial.println();Serial.print("Input_keypad() - KeyStatus = ");Serial.print(KeyStatus);Serial.print(" Pos = ");Serial.print(Pos);Serial.print(" Cur = ");Serial.print(Cur);Serial.print(" CurSelect = ");Serial.print(CurSelect);}}
 
       void Display_Display_menu11_serial()
       {if (SerialDebugDisplay){Serial.println();Serial.print("Display_menu11() - Menu = 1, Pos = ");Serial.print(Pos);}}
@@ -41,8 +41,8 @@
       void Display_Display_menu12_serial()
       {if (SerialDebugDisplay){Serial.println();Serial.print("Display_notice_menu12() - Menu = 1, Pos = ");Serial.print(Pos);}}
       
-      void Display_Display_menu2_serial()
-      {if (SerialDebugDisplay){Serial.println();Serial.print("Display_menu2() - Menu = 2 - Pos = ");Serial.print(Pos);}}
+      void Display_Display_menu_serial()
+      {if (SerialDebugDisplay){Serial.println();Serial.print("Display_menu() - Menu = ");Serial.print(Active_menu());Serial.print(" - Pos = ");Serial.print(Pos);}}
 
   //  Control debug funtions
       void Display_Reset_watchdog_timer_serial()
@@ -190,8 +190,10 @@
       void Display_Setup_light_timer_serial(){if (SerialDebugTimers)
       {
         Serial.print ("Setup_light_timer()");
-        Serial.print ("Hours with light (manually set): ");
-        Serial.println (TimeWithLight_hours);
+        Serial.print ("Time with light (manually set): ");
+        Serial.println (TimeWithLight_hour);
+        Serial.println (":");
+        Serial.println (TimeWithLight_minute);
 
         Serial.print ("Seconds with electric light (calculated): ");
         Serial.println (TimeWithElectricLight_seconds);

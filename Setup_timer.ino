@@ -1,22 +1,18 @@
 //SET TIMERS
 
 //Light
-    
+  
   void Setup_light_timer()
   {        
   //Calculate time with electric light - determine, if light schuld be activated or not
-    TimeWithElectricLight_seconds = ((TimeWithLight_hours*60UL*60UL)-TodaysSunSet_t+TodaysSunRise_t);
+    TimeWithElectricLight_seconds = ((TimeWithLight_hour*60UL*60UL+TimeWithLight_minute*60UL)-TodaysSunSet_t+TodaysSunRise_t);
     
   //Morning light ON
-    if (LightOnMorning_set == 1) // Values: 1 = Specific time set, 0 = Time set automatically to turn on in the morning and evening if needed (using TimeWithLight_hours), 2 = Disabled - turn on manually, 3 = Time set automatically to turn on only in the morning if needed
+    if (LightOnMorning_set == 1) // Values: 1 = Specific time set, 0 = Time set automatically to turn on in the morning if needed, 2 = Disabled - turn on manually
     {
       LightOnMorning_t = Time_t(LightOnMorning_hour, LightOnMorning_minute);
     }
-    if (LightOnMorning_set == 3)
-    {
-      LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds/2;
-    }
-    if (LightOnMorning_set == 3)
+    if (LightOnMorning_set == 0)
     {
       LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds;
     } 
@@ -48,7 +44,7 @@
     }
     else
     {
-      LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds/2;
+      LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds;
     }
     Display_Setup_light_timer_serial();
     Display_sunrise_sunset_serial();

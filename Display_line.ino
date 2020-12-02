@@ -1,64 +1,80 @@
-//PRINTS LINES ON LCD - update of the menu is done in Display_menu
+//PLACES CURSOR AND PRINTS LINES ON LCD - update of the menu is done in Display_menu
 
 /* SPECIAL CHARACTERS (See function Setup_LC)
- lcd.print(char(1)); // writes "æ"
- lcd.print(char(2)); // writes "ø"
- lcd.write(3); // writes "å"
- lcd.write(4); // writes "Æ"
- lcd.write(5); // writes "Ø"
- lcd.write(6); // writes "Å"
- lcd.write(7); // writes Up pointer
- lcd.print(char(0)); // writes Down pointer
+ LCD.print(char(1)); // writes "æ"
+ LCD.print(char(2)); // writes "ø"
+ LCD.write(3); // writes "å"
+ LCD.write(4); // writes "Æ"
+ LCD.write(5); // writes "Ø"
+ LCD.write(6); // writes "Å"
+ LCD.write(7); // writes Up pointer
+ LCD.print(char(0)); // writes Down pointer
 */
 
-/* STRUCTURE OF THE MENU
-   
-   START SCREEN
-   L1: Date + time
-   L2: Motor status
+  //  Menu lines
+      void Display_item(int x)
+      {
+        switch (x)
+        {
+          //Menu 1 - START SCREEN
+          case 11: Display_time();break;
+          // Item12 is used for printing a message according to a function passed as a parameter to Dispaly_menu()
+          
+          //Menu 2 - CONTROLS MENU
+          case 21: LCD.setCursor(0,Line);LCD.print("HANDLINGER      ");break;
+          case 22: LCD.setCursor(0,Line);LCD.print(" Lys til        ");break;
+          case 23: LCD.setCursor(0,Line);LCD.print(" Lys auto       ");break;
+          case 24: LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.write(3);LCD.print("bn        ");break;
+          case 25: LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.print("luk        ");break;
+          case 26: LCD.setCursor(0,Line);LCD.print(" Rede ");LCD.write(3);LCD.print("bn        ");break;
+          case 27: LCD.setCursor(0,Line);LCD.print(" Rede luk       ");break;
+          case 28: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
-   CONTROL MENU
-   L1: "Manual controls"
-   L2: Open door
-   L3: Close door
-   L4: Open nest
-   L5: Close nest
-   L6: Light on
-   L7: Light off
-   
-*/
+          //Menu 3 lines - TIMERS DISPLAY
+          case 31: LCD.setCursor(0,Line);LCD.print("TIMERE          ");break;
+          case 32: LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(1); break;
+          case 33: LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(2); break;
+          case 34: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(1); break;
+          case 35: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(4);break;
+          case 36: LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(1);break;
+          case 37: LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(4);break;
+          case 38: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
-  //  Menu 1 lines
-      void Display_item11() {Display_time();}
-      // Item12 is used for printing a message according to a function passed as a parameter to Dispaly_menu()
-  
-  //  Menu 2 lines
-      void Display_item21() {LCD.setCursor(0,Line);LCD.print("HANDLINGER      ");}
-      void Display_item22() {LCD.setCursor(0,Line);LCD.print(" Lys til        ");}
-      void Display_item23() {LCD.setCursor(0,Line);LCD.print(" Lys auto       ");}
-      void Display_item24() {LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.write(3);LCD.print("bn        ");}
-      void Display_item25() {LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.print("luk        ");}
-      void Display_item26() {LCD.setCursor(0,Line);LCD.print(" Rede ");LCD.write(3);LCD.print("bn        ");}
-      void Display_item27() {LCD.setCursor(0,Line);LCD.print(" Rede luk       ");}
-      void Display_item28() {LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");}
+          //Menu 4 lines - LIGHT MENU
+          case 41: LCD.setCursor(0,Line);LCD.print("INDSTIL LYS     ");break;
+          case 42: LCD.setCursor(0,Line);LCD.print(" T");LCD.print(char(1));LCD.print("nd mode:");Display_mode_status(LightOnMorning_set);break;
+          case 43: LCD.setCursor(0,Line);LCD.print(" S");LCD.print("luk mode:");Display_mode_status(LightOffMorning_set);break;
+          case 44: LCD.setCursor(0,Line);LCD.print(" Tids lys: ");LCDprintDigits(TimeWithLight_hour);LCD.print(":");LCDprintDigits(TimeWithLight_minute);break;
+          case 45: LCD.setCursor(0,Line);LCD.print(" Lys t"); LCD.print(char(1)); LCD.print("nd: "); LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute); break;
+          case 46: LCD.setCursor(0,Line);LCD.print(" Lys sluk: "); LCDprintDigits(LightOffMorning_hour); LCD.print(":"); LCDprintDigits(LightOffMorning_minute); break;
+          case 47: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
+          
+          //Menu 5 lines - DOOR MENU
+          case 51: LCD.setCursor(0,Line);LCD.print("INDSTIL D");LCD.write(5);LCD.print("R     ");break;
+          case 52: LCD.setCursor(0,Line);LCD.print(" ");LCD.write(6);LCD.print("bn mode: ");Display_mode_status(DoorOpen_set);break;
+          case 53: LCD.setCursor(0,Line);LCD.print(" Luk mode: ");Display_mode_status(DoorClose_set);break;
+          case 54: LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.write(3);LCD.print("bn:  "); LCDprintDigits(DoorOpen_hour); LCD.print(":"); LCDprintDigits(DoorOpen_minute); break;
+          case 55: LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.print("luk:  "); LCDprintDigits(DoorClose_hour); LCD.print(":"); LCDprintDigits(DoorClose_minute); break;
+          case 56: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
-  //  Menu 3 lines
-      void Display_item31() {LCD.setCursor(0,Line);LCD.print("TIMERE          ");}
-      void Display_item32() {LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(1);}
-      void Display_item33() {LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(2);}
-      void Display_item34() {LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(1);}
-      void Display_item35() {LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(4);}
-      void Display_item36() {LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(1);}
-      void Display_item37() {LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(4);}
-      void Display_item38() {LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");}
-  
-  //  Generic lines (use in different menues)
+          //Menu 6 lines - NEST MENU
+          case 61: LCD.setCursor(0,Line);LCD.print("INDSTIL REDE    ");break;
+          case 62: LCD.setCursor(0,Line);LCD.print(" ");LCD.write(6);LCD.print("bn mode: ");Display_mode_status(NestOpen_set);break;
+          case 63: LCD.setCursor(0,Line);LCD.print(" Luk mode: ");Display_mode_status(NestClose_set);break;
+          case 64: LCD.setCursor(0,Line);LCD.print(" Rede ");LCD.write(3);LCD.print("bn: "); LCDprintDigits(NestOpen_hour); LCD.print(":"); LCDprintDigits(NestOpen_minute); break;
+          case 65: LCD.setCursor(0,Line);LCD.print(" Rede ");;LCD.print("luk: "); LCDprintDigits(NestClose_hour); LCD.print(":"); LCDprintDigits(NestClose_minute); break;
+          case 66: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
+        }
+      }
+ 
+  //  Generic texts (use in different menues)
       
-      // Display "*" in col 0
+      // Display "*" or ">" in col 0
       void Display_cur()
       {
        LCD.setCursor(0,Line);
-       LCD.print ("*");
+       if (CurSelect == 1) {LCD.print (">");}
+       else {LCD.print ("*");}
       }
 
       // Empty old cursor " " in col 0
@@ -123,7 +139,27 @@
         Reset_watchdog_timer();
         Display_Display_update_serial();
         Display_empty();
-      }        
+       }        
+
+      //Save message
+      void Display_save(int Delay)
+      {
+        LCD.setCursor(1,Line);
+        LCD.print("               ");
+        LCD.setCursor(1,Line);
+        LCD.print("Gemmer");
+        delay(Delay);
+        LCD.print(".");
+        delay(Delay);
+        LCD.print(".");
+        delay(Delay);
+        LCD.print(".");
+        delay(Delay);
+        LCD.print(".");
+        delay(Delay);
+        Reset_watchdog_timer();
+        Display_empty();
+       }  
       
       //Temperature
       /*
@@ -137,101 +173,10 @@
        }
       }
       */   
-
-  //  Light status - line 1 - values LightStatus: 0 = No light nedded; 1 = Morning light has not been turned on yet, 2 = Morning light is turned on, 3 = Morning light has been turned off, 4 = Evening light is turned on);   
-      void Display_light_status(int x)
-      {
-        switch (x)
-        { //Space as last character to fit cursor in menues
-          case 0: LCD.print("Ikke lysbehov   "); break;
-          case 1: LCD.print("Lys t"); LCD.print(char(1)); LCD.print("nd: "); LCDprintDigits(hour(LightOnMorning_t)); LCD.print(":"); LCDprintDigits(minute(LightOnMorning_t)); break;          
-          case 2: LCD.print("Lys sluk: "); LCDprintDigits(hour(LightOffMorning_t)); LCD.print(":"); LCDprintDigits(minute(LightOffMorning_t)); LCD.print(" ");break; //Space as last character to fit cursor in menues
-          case 3: LCD.print("Lys t"); LCD.print(char(1)); LCD.print("nd: "); LCDprintDigits(hour(LightOnEvening_t)); LCD.print(":"); LCDprintDigits(minute(LightOnEvening_t));LCD.print(" "); break; //Space as last character to fit cursor in menues
-          case 4: LCD.print("Lys sluk:  "); LCDprintDigits(hour(LightOffEvening_t)); LCD.print(":"); LCDprintDigits(minute(LightOffEvening_t)); break;
-          case 5: LCD.print(" T"); LCD.print(char(1)); LCD.print("nd lys manuel"); break;
-          case 6: LCD.print("Sluk lys manuelt"); break;
-          case 7: LCD.print("Lys t"); LCD.print(char(1)); LCD.print("ndt!      ");
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  Reset_watchdog_timer();
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  break;
-          case 8: LCD.print(" Automatisk lys ");
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  Reset_watchdog_timer();
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  break;
-        }
-       }
-
-  //  Door status - line 1
-      void Display_door_status(int x)
-      {
-        switch (x)
-        {
-          case 0: break;
-          case 1: 
-               LCD.print("D"); LCD.print(char(2)); LCD.print("r "); LCD.print(char(3)); LCD.print ("bn:  "); LCDprintDigits(hour(DoorOpen_t)); LCD.print(":");LCDprintDigits(minute(DoorOpen_t));LCD.print(" "); //Space as last character to fit cursor in menues
-               break;
-          case 2: 
-               LCD.print("D"); LCD.print(char(2)); LCD.print("r "); LCD.print(char(3)); LCD.print("bner");
-               Display_processing();
-               break;    
-          case 3:
-               LCD.print ("D"); LCD.print(char(2)); LCD.print("r lukker");
-               Display_processing();
-               break;
-          case 4: 
-               LCD.print("D"); LCD.print(char(2)); LCD.print("r ");LCD.print ("luk:  "); LCDprintDigits(hour(DoorClose_t)); LCD.print(":");LCDprintDigits(minute(DoorClose_t));LCD.print(" "); //Space as last character to fit cursor in menues
-               break;
-          case 5: LCD.setCursor(0,Line);LCD.print(char(6)); LCD.print("ben d"); LCD.print(char(2)); LCD.print("r manuelt"); break;
-          case 6: LCD.setCursor(0,Line);LCD.print("Luk d"); LCD.print(char(2)); LCD.print("r manuelt"); break;
-          case 7: 
-               LCD.print("D"); LCD.print(char(2)); LCD.print("r "); LCD.print(char(3)); LCD.print("bner");
-               Display_processing();
-               break;
-          case 8:
-               LCD.print ("D"); LCD.print(char(2)); LCD.print("r lukker");
-               Display_processing();
-               break;
-        }
-       }
-
-  //  Nest status - line 1
-      void Display_nest_status(int x)
-      {
-        switch (x)
-        {
-          case 0: break;
-          case 1: LCD.print("Rede "); LCD.write(3); LCD.print ("bn: "); LCDprintDigits(hour(NestOpen_t)); LCD.print(":");LCDprintDigits(minute(NestOpen_t));LCD.print(" "); break; //Space as last character to fit cursor in menues
-          case 2: 
-              LCD.print("Rede "); LCD.print(char(3)); LCD.print("bner");
-              Display_processing();
-            break;
-          case 3:
-              LCD.print("Rede lukker");
-              Display_processing();
-            break;
-          case 4: LCD.print("Rede luk: "); LCDprintDigits(hour(NestClose_t)); LCD.print(":");LCDprintDigits(minute(NestClose_t)); LCD.print(" ");break; //Space as last character to fit cursor in menues
-          case 5: LCD.print(char(6)); LCD.print("bn rede manuelt"); break;
-          case 6: LCD.print("Luk rede manuelt"); break;
-          case 7: 
-              LCD.print("Rede "); LCD.print(char(3)); LCD.print("bner");
-              Display_processing();
-          case 8:
-              LCD.print("Rede lukker");
-              Display_processing();
-        }
-       }  
    
-   // Display "..."
+   // UTILITY FIÙNCTIONS
+   
+      //Display "..."
       void Display_processing()
       {
        delay(SensitivityKeypad);
@@ -249,7 +194,7 @@
        Reset_watchdog_timer();
       }
 
-  //  Utility function to add "0" if number is smaller than 10
+      //Utility function to add "0" if number is smaller than 10
       void LCDprintDigits(int digits)
       {
        if(digits < 10)
