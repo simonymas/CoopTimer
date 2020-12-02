@@ -56,9 +56,9 @@ Line
         else {Pos = Input_navigate_keypad();}
         Display_Input_keypad_serial();
         Display_menu();
-        if (DoorStatus > 6) {Initiate_door_event();}
-        if (NestStatus > 6) {Initiate_nest_event();}
-        if (LightStatus > 6) {Initiate_light_event();}
+        if (DoorStatus > 6) Initiate_door_event();
+        if (NestStatus > 6) Initiate_nest_event();
+        if (LightStatus > 6) Initiate_light_event();
        }
        if (Active_menu() > 1) {Display_menu();}
       }
@@ -92,29 +92,26 @@ Line
        {
         case RIGHT:
          Cur = 2;
-         if (Pos > (MenuMax*10)) return 11;
+         if (Pos > (MenuMax*10)) {return 11;}
          return (Pos-Pos%10+11);
          break;
                
         case LEFT:
          Cur = 2;
-         if (Pos < 20) return (MenuMax*10+1);
+         if (Pos < 20) {return (MenuMax*10+1);}
          return (Pos-Pos%10-9);
          break;
    
         case UP:
-         if (Pos < 20) return 11;
+         if (Pos < 20) {return 11;}
          if (Pos%10 == 1) {Cur = 2; CurDel = 1; return Pos;}
-         if (Pos%10 == 2)
-          {
-           if (Cur = 1) {Cur = 1; return --Pos;}
-          }
-         if (Cur == 1) {Cur = 0; CurDel = 1; return Pos; }
-         if (Cur == 0) return --Pos;
+         if (Pos%10 == 2) {if (Cur = 1) return --Pos;}
+         if (Cur == 1) {Cur = 0; CurDel = 1; return Pos;}
+         if (Cur == 0) {return --Pos;}
          break;
         
         case DOWN:
-          if (Pos < 20) return 11;
+          if (Pos < 20) {return 11;}
           if (Pos%10 == (LineMax-1)) {Cur = 1; return Pos;}
           if (Cur == 1) {return ++Pos;}
           if (Pos%10 == 1) {Cur = 1; CurDel = 2; return Pos;}
@@ -124,14 +121,12 @@ Line
           break;
         
         case SELECT:
-           if (Pos < 20) return 11; //Start screen has no actions
-           if (Pos%10 == 1) 
-           {
-            if (Cur == 0) return Pos; //First menu item always a header with no actions
-           }
-           if (Pos%10 == (LineMax-1)) return 11; //Last menu item always exits to start screen
-           if (Cur == 1) {++Pos;}
-           if (Active_menu()>3)
+           if (Pos < 20) {return 11;}                            //ACTIONS MENU
+           if (Pos%10 == 1)                                    //ACTIONS first and last menu items
+           {if (Cur == 2) {return Pos;}}                                    //First menu item always a header with no action
+           if (Pos%10 == (LineMax-1)) {return 11;}                          //Last menu item always exits to start screen
+           if (Cur == 1) {++Pos;}                              
+           if (Active_menu()>3)                                //ACTIONS MENU 4+
            {
             switch(CurSelect)
             {
@@ -139,24 +134,21 @@ Line
              case 1: CurSelect = 0;break;
             } 
            }
-           if (Active_menu<4)
+           if (Active_menu() == 2)                              //ACTIONS MENU 2
            {
             switch (Pos)
             {            
-             //ACTIONS MENU 2
              case 22: LightStatus = 7; return 11; break;
              case 23: LightStatus = 8; return 11; break;
              case 24: DoorStatus = 7; return 11; break;
              case 25: DoorStatus = 8; return 11; break;
              case 26: NestStatus = 7; return 11; break;
-             case 27: NestStatus = 8; return 11; break;
-            
-             //NO ACTION FROM MENU 3
-             default: return 77; break;
+             case 27: NestStatus = 8; return 11; break;         
             }
+            if (Active_menu() == 3) return Pos;                 //ACTION MENU 3
            }
            if (Cur == 1) {--Pos;}
-           default: return Pos; break;
+           default: return Pos;
         }
       }
 

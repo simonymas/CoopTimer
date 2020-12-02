@@ -44,7 +44,7 @@
           case 41: LCD.setCursor(0,Line);LCD.print("INDSTIL LYS     ");break;
           case 42: LCD.setCursor(0,Line);LCD.print(" T");LCD.print(char(1));LCD.print("nd mode:");Display_mode_status(LightOnMorning_set);break;
           case 43: LCD.setCursor(0,Line);LCD.print(" S");LCD.print("luk mode:");Display_mode_status(LightOffMorning_set);break;
-          case 44: LCD.setCursor(0,Line);LCD.print(" Tids lys: ");LCDprintDigits(TimeWithLight_hour);LCD.print(":");LCDprintDigits(TimeWithLight_minute);break;
+          case 44: LCD.setCursor(0,Line);LCD.print(" Tid lys:  ");LCDprintDigits(TimeWithLight_hour);LCD.print(":");LCDprintDigits(TimeWithLight_minute);break;
           case 45: LCD.setCursor(0,Line);LCD.print(" Lys t"); LCD.print(char(1)); LCD.print("nd: "); LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute); break;
           case 46: LCD.setCursor(0,Line);LCD.print(" Lys sluk: "); LCDprintDigits(LightOffMorning_hour); LCD.print(":"); LCDprintDigits(LightOffMorning_minute); break;
           case 47: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
