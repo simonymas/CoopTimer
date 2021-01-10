@@ -121,7 +121,7 @@ Line
           break;
         
         case SELECT:
-           if (Pos < 20) {return 11;}                            //ACTIONS MENU
+           if (Pos < 20) {return 11;}                         //ACTIONS MENU
            if (Pos%10 == 1)                                    //ACTIONS first and last menu items
            {if (Cur == 2) {return Pos;}}                                    //First menu item always a header with no action
            if (Pos%10 == (LineMax-1)) {return 11;}                          //Last menu item always exits to start screen
@@ -134,17 +134,17 @@ Line
              case 1: CurSelect = 0;break;
             } 
            }
-           if (Active_menu() == 2)                              //ACTIONS MENU 2
-           {
-            switch (Pos)
-            {            
-             case 22: LightStatus = 7; return 11; break;
-             case 23: LightStatus = 8; return 11; break;
-             case 24: DoorStatus = 7; return 11; break;
-             case 25: DoorStatus = 8; return 11; break;
-             case 26: NestStatus = 7; return 11; break;
-             case 27: NestStatus = 8; return 11; break;         
-            }
+             if (Active_menu() == 2)                              //ACTIONS MENU 2
+             {
+              switch (Pos)
+              {            
+               case 22: LightStatus = 7; return 11; break;
+               case 23: LightStatus = 8; return 11; break;
+               case 24: DoorStatus = 7; return 11; break;
+               case 25: DoorStatus = 8; return 11; break;
+               case 26: NestStatus = 7; return 11; break;
+               case 27: NestStatus = 8; return 11; break;         
+              }
             if (Active_menu() == 3) return Pos;                 //ACTION MENU 3
            }
            if (Cur == 1) {--Pos;}

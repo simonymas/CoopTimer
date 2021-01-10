@@ -1,10 +1,4 @@
 //FUNCTIONS TO DISPLAY CONTENT ON SERIAL SCREEN
-
-  //  Error message
-      void Display_ERROR_serial()
-      {
-       Serial.print("ERROR!"); 
-      } 
        
   //  Setup debug functions
       void Display_Setup_i2c_serial()

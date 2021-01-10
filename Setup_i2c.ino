@@ -47,41 +47,4 @@ void sendData(){
     if (number == 7) {
     Wire.write(second());
   }
-    /*
-    if (number == 8) {
-    int rtemp = round(temp);
-    Wire.write(rtemp);
-    }
-    */
-    
-    if (number == 9) {
-    Wire.write(hour(LightOnMorning_t));
-    }
-     
-    if (number == 10) {
-    Wire.write(minute(LightOnMorning_t));
-   }
-    
-       if (number == 11) {
-    Wire.write(hour(LightOffMorning_t));
-   }
-   
-       if (number == 12) {
-    Wire.write(minute(LightOffMorning_t));
-   }
-   
-          if (number == 13) {
-    Wire.write(hour(LightOnEvening_t));
-   }
-   
-       if (number == 14) {
-    Wire.write(minute(LightOnEvening_t));
-   }
-             if (number == 15) {
-    Wire.write(hour(LightOffEvening_t));
-   }
-   
-       if (number == 16) {
-    Wire.write(minute(LightOffEvening_t));
-   }
 }

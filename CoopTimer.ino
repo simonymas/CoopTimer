@@ -1,7 +1,17 @@
 /******************************************************************
  Created - 10.01.2020 08:35
+ 
  Project    : TIME CONTROLLER PROGRAM - cooptimer
- Libraries  : Wire.h, TimeLib.h, TimeLord.h, OneWire.h, LiquidCrystal.h, EEPROM.h, avr/wdt.h
+ 
+ Libraries  : Wire.h //Included in Arduino IDE folder hardware/libraries/Wire
+              TimeLib.h http://swfltek.com/arduino/timelord_library_deprecated.pdf
+              TimeLord.h https://codebender.cc/library/TimeLord#TimeLord.h
+              OneWire.h http://www.pjrc.com/teensy/arduino_libraries/OneWire.zip
+              (Disabled; DallasTemperature.h http://www.milesburton.com/Main_Page?title=Dallas_Temperature_Control_Library#Download)
+              LiquidCrystal.h Included in Arduino IDE folder
+              EEPROM.h Included in Arduino IDE folder
+              avr/wdt.h Included in Arduino IDE folder
+ 
  Author     : Simon Nyrup Madsen
  
  DESCRIPTION:
@@ -24,10 +34,10 @@
  
  HARDWARE:  
  *  Arduino Uno/Mega (Disable code for the board, that is not relevant to you)
- *  Clock-mocule DS3231 (Insert rechargeable battery LIR2032. )
+ *  Clock-mocule DS3231 (insert rechargeable battery LIR2032)
         Power: 3.3V, ~3.0 microA
         Pins: Connect to SCL and SDA on Arduino and supplied from 3.3 V outlet and GND on Arduino
-        Library: TimeLib.h v.7.2011
+        Library: Wire.h, TimeLib.h v.7.2011
  *  Relay-module - 8 Realys in this version
         Power: 5V, max. 575 mA - external supply
         Pins: A8-15 (Arduino Mega), GND on arduino on pin side - seperate GND and power supply to VCC-JD from external power supply
@@ -46,18 +56,18 @@
 //INCLUSION OF LIBRARIES - libraries compatible with Arduino IDE 1.8.13
 
   //  I2C connection
-      #include <Wire.h> //Included in Arduino IDE folder hardware/libraries/Wire
+      #include <Wire.h> 
       
   //  Time features
-      #include <TimeLib.h> //https://codebender.cc/library/TimeLord#TimeLord.h - place in sketchbook folder as specified in Files/Preferences/
-      #include <TimeLord.h> //http://swfltek.com/arduino/timelord_library_deprecated.pdf - place in sketchbook folder as specified in Files/Preferences/
+      #include <TimeLib.h>
+      #include <TimeLord.h>
             
   //  Temperature
-      #include <OneWire.h> //http://www.pjrc.com/teensy/arduino_libraries/OneWire.zip - place in sketchbook folder as specified in Files/Preferences/
-      //#include <DallasTemperature.h> //http://www.milesburton.com/Main_Page?title=Dallas_Temperature_Control_Library#Download - place in sketchbook folder as specified in Files/Preferences/
+      #include <OneWire.h>
+      //#include <DallasTemperature.h>
       
   //  LCD display
-      #include  <LiquidCrystal.h> //Included in Arduino IDE folder
+      #include  <LiquidCrystal.h>
       
   //  EEPROM to save settings to non-volatile memory on the board
       #include <EEPROM.h>
