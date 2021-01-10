@@ -15,7 +15,7 @@
      case 6: break;
      case 7: Motor_on_light(); Display_notice_menu(Display_light_status, LightStatus); break;
      case 8: Display_notice_menu(Display_light_status, LightStatus); break;
-     default: Display_ERROR; Display_ERROR_serial; break;
+     default: break;
    }
    Check_light_status();
   }
@@ -33,7 +33,7 @@
       case 6: break;
       case 7: Motor_open_door(); break;
       case 8: Motor_close_door(); break;
-      default: Display_ERROR(); Display_ERROR_serial(); break;
+      default: break;
    }
    Check_door_status();
   } 
@@ -51,7 +51,7 @@
       case 6: break;
       case 7: Motor_open_nest(); break;
       case 8: Motor_close_nest(); break;
-      default: Display_ERROR(); Display_ERROR_serial(); break;
+      default: break;
    }
    Check_nest_status();
   }
