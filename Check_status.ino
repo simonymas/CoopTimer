@@ -1,13 +1,5 @@
 //DETERMINES THE STATUS OF LIGHT, DOOR AND NESTS. STATUS IS USED TO DETERMINE, IF EVENTS SCHOULD BE INITIATED
 
-  //  Variables used in checks
-      byte LightStatus = 0; //Values: 0 = No light nedded; 1 = Morning light has not been turned on yet, 2 = Morning light is turned on, 3 = Morning light has been turned off, 4 = Evening light is turned on)
-      byte DoorStatus = 0; //Values: 0 = Not set; 1 = Closed; 2 = Opening; 3 = Open; 4 = Closing - See explanation in Check_door_status
-      byte NestStatus = 0; //Values: 0 = Not set; 1 = Closed; 2 = Opening; 3 = Open; 4 = Closing
-      
-      byte DoorActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
-      byte NestActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
-
  //Check light status
  /*
   Values:

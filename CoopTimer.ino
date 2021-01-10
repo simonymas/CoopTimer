@@ -1,4 +1,49 @@
-//INCLUSION OF LIBRARIES - libraries compatible with Arduino IDE 1.6.1
+/******************************************************************
+ Created - 10.01.2020 08:35
+ Project    : TIME CONTROLLER PROGRAM - cooptimer
+ Libraries  : Wire.h, TimeLib.h, TimeLord.h, OneWire.h, LiquidCrystal.h, EEPROM.h, avr/wdt.h
+ Author     : Simon Nyrup Madsen
+ 
+ DESCRIPTION:
+ This program is designes to control relays on the basis of timers and manual inputs on a keypad.
+ Its features includes:
+ * Timekeeping and setting timers
+ * Calculation of todays sunset and sunrise for automatic timekeeping
+ * Control of 8 relays
+ * Keypad and display for manual control and for chaning settings.
+ In this version, the program is designed to manage a chicken coop with automatic lights as well as doors and nests operated by lineary actuators.
+ 
+ USER INPUTS (SETTINGS IN CODE):
+ * Time om DS3032 set at first upload, then disabled in code before uploaded again (else it will set to this time, every time arduino resets)
+ * Lounguitude and altitude - to determine sunset ande sunrise
+ * Default timer parameters and delays
+ * Serial debug - set to true or false
+    
+ SUGGESTED IMPROVEMENTS:
+ * All settings set by user from KeyPad using EEPROM, including time and longitude/altitude
+ 
+ HARDWARE:  
+ *  Arduino Uno/Mega (Disable code for the board, that is not relevant to you)
+ *  Clock-mocule DS3231 (Insert rechargeable battery LIR2032. )
+        Power: 3.3V, ~3.0 microA
+        Pins: Connect to SCL and SDA on Arduino and supplied from 3.3 V outlet and GND on Arduino
+        Library: TimeLib.h v.7.2011
+ *  Relay-module - 8 Realys in this version
+        Power: 5V, max. 575 mA - external supply
+        Pins: A8-15 (Arduino Mega), GND on arduino on pin side - seperate GND and power supply to VCC-JD from external power supply
+ *  LCD Keypad Shield, DF Robot
+ *      Power: 5V, 20-40 mA
+        Pins: LCD D4-10, Keypad A0
+        Library: LiquidCrystal.h
+ *  Temperature sensor S18B20 (Currently disabled in code)
+        Power: 5V, 1mA
+        Pins: GND, VCC, SIG
+        Library: DallasTemperature.h
+ *  Lineary actuators (connected to Relay)
+
+******************************************************************/
+
+//INCLUSION OF LIBRARIES - libraries compatible with Arduino IDE 1.8.13
 
   //  I2C connection
       #include <Wire.h> //Included in Arduino IDE folder hardware/libraries/Wire
@@ -89,13 +134,13 @@
       #define NestClose_hour_address         19
       #define NestClose_minute_address       20    
 
-//SETTINGS
+//DECLARATION OF GLOBAL VARIABLES AND SETTING SOME VALUES (SETTINGS)
     
   //  Activate debugging messages in serial screen - set to true to debug (Warning: if all is activated, dynamic memory will overload)
-      const bool SerialDebugSetup = true;
-      const bool SerialDebugDisplay = true;
-      const bool SerialDebugControls = true;
-      const bool SerialDebugTimers = true;
+      const bool SerialDebugSetup = false;
+      const bool SerialDebugDisplay = false;
+      const bool SerialDebugControls = false;
+      const bool SerialDebugTimers = false;
       const bool SerialDebugStatus = false;
       
   //  Constants and preset values for timer-variables (values used, when nothing has yet been saved in EEPROM, or if code overwriting EEPROM status variable is activated in setup-routine)
@@ -166,7 +211,7 @@
       int  SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
       int MenuReset = 50; // Seconds before menu exits,so loop can continue. If value is to high, system will reset (don´t know why...)
 
-//DECLARATION OF SOME GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
+//DECLARATION OF SOME ADDITIONAL GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
   //  Calculated in Setup_sun()
       time_t TodaysSunRise_t; 
       time_t TodaysSunSet_t;
@@ -232,6 +277,21 @@
       byte Line = 0;
       byte ValueChanged =0;
 
+  //  Variables used in Check_status fucntions
+      byte LightStatus = 0; //Values: 0 = No light nedded; 1 = Morning light has not been turned on yet, 2 = Morning light is turned on, 3 = Morning light has been turned off, 4 = Evening light is turned on)
+      byte DoorStatus = 0; //Values: 0 = Not set; 1 = Closed; 2 = Opening; 3 = Open; 4 = Closing - See explanation in Check_door_status
+      byte NestStatus = 0; //Values: 0 = Not set; 1 = Closed; 2 = Opening; 3 = Open; 4 = Closing
+      
+      byte DoorActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
+      byte NestActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
+      
+  /*
+  //  For temperature sensor
+      OneWire oneWire(Temp_PWM); 
+      DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
+      float temp = sensors.getTempCByIndex(0);
+      */
+      
   //  From Setup_reset functions
       time_t ResetTime_t;
       time_t MenuReset_t;

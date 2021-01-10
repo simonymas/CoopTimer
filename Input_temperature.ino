@@ -2,11 +2,6 @@
 
 /*
 
-  //  Definition of global variables
-      OneWire oneWire(Temp_PWM); 
-      DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
-      float temp = sensors.getTempCByIndex(0);
-
 void Input_temp()
 {
       sensors.requestTemperatures();
