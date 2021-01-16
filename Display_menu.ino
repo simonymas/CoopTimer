@@ -84,5 +84,5 @@
   //  Reset to menu 1
       void Reset_menu()
       {
-       if (MenuReset_t < now()) {Pos = 11;}
+       if (MenuReset_t < now()) {Pos = 11;Cur = 2; CurSelect = 0;}
       }

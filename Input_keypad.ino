@@ -112,7 +112,7 @@ Line
         
         case DOWN:
           if (Pos < 20) {return 11;}
-          if (Pos%10 == (LineMax-1)) {Cur = 1; return Pos;}
+          if (Pos%10 == (LineMax-1)) {Cur = 1; CurDel = 0; return Pos;}
           if (Cur == 1) {return ++Pos;}
           if (Pos%10 == 1) {Cur = 1; CurDel = 2; return Pos;}
           if (Cur == 2) {Cur = 1; return Pos;}
@@ -121,7 +121,7 @@ Line
           break;
         
         case SELECT:
-           if (Pos < 20) {return 11;}                         //ACTIONS MENU
+           if (Pos < 20) {return 11;}                          //ACTIONS MENU
            if (Pos%10 == 1)                                    //ACTIONS first and last menu items
            {if (Cur == 2) {return Pos;}}                                    //First menu item always a header with no action
            if (Pos%10 == (LineMax-1)) {return 11;}                          //Last menu item always exits to start screen

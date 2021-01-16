@@ -31,6 +31,7 @@
     
  SUGGESTED IMPROVEMENTS:
  * All settings set by user from KeyPad using EEPROM, including time and longitude/altitude
+ * Enable reset to preset values from keypad
  
  HARDWARE:  
  *  Arduino Uno/Mega (Disable code for the board, that is not relevant to you)
@@ -280,8 +281,8 @@
       int KeyStatus = 0;
       int KeyValue = 0;     
       byte Pos = 11;
-      byte Cur = 2;
-      byte CurSelect = 0;
+      byte Cur = 2;     //Values:  2: cursor off, 0: Cursor line 0, 1: cur line 1
+      byte CurSelect = 0;  //Values:  1: Line selected, 0: Line not selected
       byte PosLast = 0;
       byte CurDel = 2;
       byte Line = 0;
