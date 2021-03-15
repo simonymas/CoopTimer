@@ -1,5 +1,7 @@
 //Define special characters æ,ø,å,Æ,Ø og Å
     
+ void Setup_LCD()
+ {
   byte Lae[8] ={ B00000,B00000,B11010,B00101,B01111,B10100,B11111,B00000}; // æ
   byte Loe[8] ={ B00000,B00001,B01110,B10101,B10101,B01110,B10000,B00000}; // ø
   byte Laa[8] ={ B00100,B00000,B01110,B00001,B01111,B10001,B01111,B00000}; // å
@@ -10,8 +12,6 @@
   byte Down[8] = {B00100,B00100,B00100,B00100,B10101,B01010,B00100,B00000}; // Down
   // æ, ø, å, Æ, Ø, Å, Up pointer, down pointer saved in RAM-adress 1, 2, 3, 4, 5, 6, 7, 0
 
- void Setup_LCD()
- {
   LCD.begin(16,2);
   LCD.clear();
   LCD.setCursor(0,0);

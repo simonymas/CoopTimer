@@ -1,49 +1,4 @@
-//SETS STATUS OF SENSOR BUTTONS
-
-/*
-MENU STRUCTURE
-
-Variable "Pos" is comprised of menunumber (1st integer) and line number shown i line 0 of the display (2nd integer).
-Variable "Cur" has the values 0 = line 0, 1 = line 1, 2 = not shown
-
-Menu     1 - Start menu                     2 - Control menu              
-Line
-1        11 [date] + [time]                 21 HANDLINGER       
-2        12 [light/door/nest staus]         22  Tænd lys      
-3                                           23  Auto lys        
-4                                           24  Åbn dør         
-5                                           25  Luk dør         
-6                                           26  Åbn rede        
-7                                           27  Luk rede        
-8                                           28  EXIT MENU      
- */
- 
-  // Define number of menues
-
-     #define MenuMax     6
-  
-  // Define number of lines in each menu
-      
-     #define Lines_menu1 2
-     #define Lines_menu2 8    
-     #define Lines_menu3 8
-     #define Lines_menu4 7
-     #define Lines_menu5 6
-     #define Lines_menu6 6
-      
-     byte Linemax_menu()
-     {
-       switch (Active_menu())
-       {
-         case 1: return Lines_menu1;
-         case 2: return Lines_menu2;
-         case 3: return Lines_menu3;
-         case 4: return Lines_menu4;
-         case 5: return Lines_menu5;
-         case 6: return Lines_menu6;
-         return 8;
-       }
-     }
+//CALCULATES INPUTS FROM KEYPAD
         
   //  Update position from keypad input
       void Input_keypad()
@@ -64,7 +19,6 @@ Line
       }
         
   //  Get input from keypad 
-
       #define RIGHT  0
       #define UP     1
       #define DOWN   2
@@ -105,7 +59,7 @@ Line
         case UP:
          if (Pos < 20) {return 11;}
          if (Pos%10 == 1) {Cur = 2; CurDel = 1; return Pos;}
-         if (Pos%10 == 2) {if (Cur = 1) return --Pos;}
+         if (Pos%10 == 2 && Cur == 0) {Cur = 1; return --Pos;}
          if (Cur == 1) {Cur = 0; CurDel = 1; return Pos;}
          if (Cur == 0) {return --Pos;}
          break;
@@ -169,13 +123,17 @@ Line
         CurSelect = 0;
         if (ValueChanged == 1)
         {
-         Eeprom_status = 2;
-         Setup_eeprom();
-         Setup_light_timer();
-         Setup_door_timer();
-         Setup_nest_timer();
+         if (Active_menu() == 7) {Setup_arduino_from_menu_time();}
+         else
+         {
+          Eeprom_status = 2;
+          Setup_eeprom();
+          Setup_light_timer();
+          Setup_door_timer();
+          Setup_nest_timer();
+         }
          Line = Cur;
-         Display_save(500);
+         Display_save(200);
          ValueChanged = 0;
         }
          break;
@@ -194,61 +152,103 @@ Line
        case 42:  LightOnMorning_set = Adjust_mode(LightOnMorning_set, x); break;
        case 43:  LightOffMorning_set = Adjust_mode(LightOffMorning_set, x); break;
        case 44:                      
-                 TimeWithLight_hour = hour(Adjust_time(TimeWithLight_hour,TimeWithLight_minute, x));
-                 TimeWithLight_minute = minute(Adjust_time(TimeWithLight_hour,TimeWithLight_minute, x));
+                 TimeWithLight_hour = hour(Adjust_time(TimeWithLight_hour,TimeWithLight_minute, x*10));
+                 TimeWithLight_minute = minute(Adjust_time(TimeWithLight_hour,TimeWithLight_minute, x*10));
                  break;  
        case 45:         
-                 LightOnMorning_hour = hour(Adjust_time(LightOnMorning_hour, LightOnMorning_minute, x));
-                 LightOnMorning_minute = minute(Adjust_time(LightOnMorning_hour, LightOnMorning_minute, x));    
+                 LightOnMorning_hour = hour(Adjust_time(LightOnMorning_hour, LightOnMorning_minute, x*10));
+                 LightOnMorning_minute = minute(Adjust_time(LightOnMorning_hour, LightOnMorning_minute, x*10));    
                  break;
        case 46: 
-                 LightOffMorning_hour = hour(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x));
-                 LightOffMorning_minute = minute(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x));
+                 LightOffMorning_hour = hour(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x*10));
+                 LightOffMorning_minute = minute(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x*10));
                  break;
 
-        //DOOR MENU
+       //DOOR MENU
        case 52:  DoorOpen_set = Adjust_mode(DoorOpen_set, x); break;
        case 53:  DoorClose_set = Adjust_mode(DoorClose_set, x); break;
        case 54:         
-                 DoorOpen_hour = hour(Adjust_time(DoorOpen_hour, DoorOpen_minute, x));
-                 DoorOpen_minute = minute(Adjust_time(DoorOpen_hour, DoorOpen_minute, x));    
+                 DoorOpen_hour = hour(Adjust_time(DoorOpen_hour, DoorOpen_minute, x*10));
+                 DoorOpen_minute = minute(Adjust_time(DoorOpen_hour, DoorOpen_minute, x*10));    
                  break;
        case 55: 
-                 DoorClose_hour = hour(Adjust_time(DoorClose_hour, DoorClose_minute, x));
-                 DoorClose_minute = minute(Adjust_time(DoorClose_hour, DoorClose_minute, x));
+                 DoorClose_hour = hour(Adjust_time(DoorClose_hour, DoorClose_minute, x*10));
+                 DoorClose_minute = minute(Adjust_time(DoorClose_hour, DoorClose_minute, x*10));
                  break;
 
-        //NEST MENU
+       //NEST MENU
        case 62:  NestOpen_set = Adjust_mode(NestOpen_set, x); break;
        case 63:  NestClose_set = Adjust_mode(NestClose_set, x); break;
        case 64:         
-                 NestOpen_hour = hour(Adjust_time(NestOpen_hour, NestOpen_minute, x));
-                 NestOpen_minute = minute(Adjust_time(NestOpen_hour, NestOpen_minute, x));    
+                 NestOpen_hour = hour(Adjust_time(NestOpen_hour, NestOpen_minute, x*10));
+                 NestOpen_minute = minute(Adjust_time(NestOpen_hour, NestOpen_minute, x*10));    
                  break;
        case 65: 
-                 NestClose_hour = hour(Adjust_time(NestClose_hour, NestClose_minute, x));
-                 NestClose_minute = minute(Adjust_time(NestClose_hour, NestClose_minute, x));
+                 NestClose_hour = hour(Adjust_time(NestClose_hour, NestClose_minute, x*10));
+                 NestClose_minute = minute(Adjust_time(NestClose_hour, NestClose_minute, x*10));
                  break;
+
+       //Time MENU
+       case 72:  Time_hour = hour(Adjust_time(Time_hour, minute(), x*60)); break;
+       case 73:  Time_minute = minute(Adjust_time(hour(), Time_minute, x)); break;
+       case 74:  Time_day = Adjust_day(x); break;
+       case 75:  Time_month = Adjust_month(x); break;
+       case 76:  Time_year = Time_year+x; break;
       }
       if (Cur == 1) {--Pos;}
      }
 
-//  Utility function: Calculate time_t for specific time (hour and minutes)
+//  Calculate number of lines in the present menu      
+    byte Linemax_menu()
+    {
+      switch (Active_menu())
+      {
+        case 1: return Lines_menu1;
+        case 2: return Lines_menu2;
+        case 3: return Lines_menu3;
+        case 4: return Lines_menu4;
+        case 5: return Lines_menu5;
+        case 6: return Lines_menu6;
+        case 7: return Lines_menu7;
+        return 8;
+      }
+    }
+
+//  Utility function: Adjust time_t for specific time (hour and minutes)
     time_t Adjust_time(byte Hour, byte Minute, int AddedValue)
     {
      time_t AdjustedHourMinute_t;
      TimeElements tm;
      tm.Hour = Hour;
      tm.Minute = Minute;
-     tm.Second = 0;
-     tm.Day = 1;
-     tm.Month = 1;
-     tm.Year = 2020-1970;
-     AdjustedHourMinute_t = makeTime(tm) + AddedValue*60*10;
+     tm.Second = 30;
+     tm.Day = Time_day;
+     tm.Month = Time_month;
+     tm.Year = Time_year-1970;
+     AdjustedHourMinute_t = makeTime(tm) + AddedValue*60;
      return AdjustedHourMinute_t;
     }
 
-//  Utility function to adjust mode
+//  Utility function: Adjust day
+    byte Adjust_day(int AddedDay)
+    {
+     byte AdjustedDay;
+     if(Time_day == 31 && AddedDay > 0) {AdjustedDay = 1;}
+     else if(AddedDay < 0 && Time_day==1) {AdjustedDay = 31;}
+     else {AdjustedDay = Time_day+AddedDay;}
+     return AdjustedDay;
+    }
+
+//  Utility function: Adjust month
+    byte Adjust_month(int AddedMonth)
+    {
+     if(AddedMonth > 0 && Time_month == 12) {Time_month = 1;}
+     if(AddedMonth < 0 && Time_month == 1) {Time_month = 12;}
+     else {Time_month = Time_month+AddedMonth;}
+     return Time_month;
+    }
+    
+//  Utility function: Adjust mode
     byte Adjust_mode(byte ModeLast, int AddedValue)
     {
      int ModeNew;

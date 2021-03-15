@@ -27,6 +27,7 @@
           EEPROM.put(NestClose_hour_address, NestClose_hour_preset);
           EEPROM.put(NestClose_minute_address, NestClose_minute_preset);
         }
+        
         if (Eeprom_status == 2)  
         {
           EEPROM.put(Eeprom_status_address,1);   

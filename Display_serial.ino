@@ -299,16 +299,7 @@
         Serial.println (NestClose_t);
       }}
 
-  //  Status debug functions      
-      /*
-      //  Temperature
-      void Display_temp_serial(){if (SerialDebugTimers)
-      {
-       Serial.print(sensors.getTempCByIndex(0));
-       Serial.print(char(243));
-       Serial.println("C");
-      }}
- */
+  //  Status debug functions    
    
       //  Status of light
       void Display_light_status_serial() {if (SerialDebugStatus)

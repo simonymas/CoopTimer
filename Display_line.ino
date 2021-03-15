@@ -64,6 +64,15 @@
           case 64: LCD.setCursor(0,Line);LCD.print(" Rede ");LCD.write(3);LCD.print("bn: "); LCDprintDigits(NestOpen_hour); LCD.print(":"); LCDprintDigits(NestOpen_minute); break;
           case 65: LCD.setCursor(0,Line);LCD.print(" Rede ");;LCD.print("luk: "); LCDprintDigits(NestClose_hour); LCD.print(":"); LCDprintDigits(NestClose_minute); break;
           case 66: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
+
+          //Menu 7 lines - TIME MENU
+          case 71: LCD.setCursor(0,Line);LCD.print("INDSTIL TID     ");break;
+          case 72: LCD.setCursor(0,Line);LCD.print(" Time:       ");LCDprintDigits(Time_hour);LCD.print(":");break;
+          case 73: LCD.setCursor(0,Line);LCD.print(" Minut:      ");LCD.print(":");LCDprintDigits(Time_minute);break;
+          case 74: LCD.setCursor(0,Line);LCD.print(" Dag:         ");LCDprintDigits(Time_day);break;
+          case 75: LCD.setCursor(0,Line);LCD.print(" M");LCD.write(3);LCD.print("ned:       ");LCDprintDigits(Time_month);break;
+          case 76: LCD.setCursor(0,Line);LCD.print(" ");LCD.write(6);LCD.print("r:        ");LCD.print(Time_year);break;
+          case 77: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
         }
       }
  
@@ -160,19 +169,6 @@
         Reset_watchdog_timer();
         Display_empty();
        }  
-      
-      //Temperature
-      /*
-      void Display_temp()
-      {
-       {
-        LCD.setCursor(6,Line);
-        LCD.print(sensors.getTempCByIndex(0));
-        LCD.print(char(223));
-        LCD.print("C");
-       }
-      }
-      */   
    
    // UTILITY FIÙNCTIONS
    
@@ -197,8 +193,7 @@
       //Utility function to add "0" if number is smaller than 10
       void LCDprintDigits(int digits)
       {
-       if(digits < 10)
-       LCD.print('0');
+       if(digits < 10) {LCD.print("0");}
        LCD.print(digits);
       }
   

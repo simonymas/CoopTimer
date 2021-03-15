@@ -6,8 +6,6 @@
  Libraries  : Wire.h //Included in Arduino IDE folder hardware/libraries/Wire
               TimeLib.h http://swfltek.com/arduino/timelord_library_deprecated.pdf
               TimeLord.h https://codebender.cc/library/TimeLord#TimeLord.h
-              OneWire.h http://www.pjrc.com/teensy/arduino_libraries/OneWire.zip
-              (Disabled; DallasTemperature.h http://www.milesburton.com/Main_Page?title=Dallas_Temperature_Control_Library#Download)
               LiquidCrystal.h Included in Arduino IDE folder
               EEPROM.h Included in Arduino IDE folder
               avr/wdt.h Included in Arduino IDE folder
@@ -24,32 +22,27 @@
  In this version, the program is designed to manage a chicken coop with automatic lights as well as doors and nests operated by lineary actuators.
  
  USER INPUTS (SETTINGS IN CODE):
- * Time om DS3032 set at first upload, then disabled in code before uploaded again (else it will set to this time, every time arduino resets)
- * Lounguitude and altitude - to determine sunset ande sunrise
+ * Default values at first upload - activate in Setup(), reset arduino and disabled in code before uploading again
+ * Lounguitude and altitude - to determine times of sunset and sunrise
  * Default timer parameters and delays
  * Serial debug - set to true or false
     
  SUGGESTED IMPROVEMENTS:
- * All settings set by user from KeyPad using EEPROM, including time and longitude/altitude
  * Enable reset to preset values from keypad
  
  HARDWARE:  
- *  Arduino Uno/Mega (Disable code for the board, that is not relevant to you)
+ *  Arduino Uno/Mega (disable code for the board, that is not relevant to you)
  *  Clock-mocule DS3231 (insert rechargeable battery LIR2032)
         Power: 3.3V, ~3.0 microA
         Pins: Connect to SCL and SDA on Arduino and supplied from 3.3 V outlet and GND on Arduino
-        Library: Wire.h, TimeLib.h v.7.2011
+        Libraries: Wire.h, TimeLib.h v.7.2011
  *  Relay-module - 8 Realys in this version
         Power: 5V, max. 575 mA - external supply
         Pins: A8-15 (Arduino Mega), GND on arduino on pin side - seperate GND and power supply to VCC-JD from external power supply
  *  LCD Keypad Shield, DF Robot
- *      Power: 5V, 20-40 mA
+        Power: 5V, 20-40 mA
         Pins: LCD D4-10, Keypad A0
         Library: LiquidCrystal.h
- *  Temperature sensor S18B20 (Currently disabled in code)
-        Power: 5V, 1mA
-        Pins: GND, VCC, SIG
-        Library: DallasTemperature.h
  *  Lineary actuators (connected to Relay)
 
 ******************************************************************/
@@ -62,11 +55,7 @@
   //  Time features
       #include <TimeLib.h>
       #include <TimeLord.h>
-            
-  //  Temperature
-      #include <OneWire.h>
-      //#include <DallasTemperature.h>
-      
+                  
   //  LCD display
       #include  <LiquidCrystal.h>
       
@@ -106,14 +95,9 @@
       LiquidCrystal LCD( 8, 9, 4, 5, 6, 7); //LCD pins set by syntax LiquidCrystal [Name](RS,E,D4,D5,D6,D7)
       #define DisplayLight_OUT 10 //Light intensity on display - usend in Setup_LCD()
 
-  //  Temperature sensor DS18B20
-      //#define Temp_PWM 11
-
   //  Real Time Clock DS3231  
-      //RTC_SDA; - asigned by Wire library
-      //RTC_SCL; - asigned by Wire library
-      //GND
-      //3,3V
+      //RTC_SDA
+      //RTC_SCL
 
 //DISTRIBUTION OF EEPROM ADRESSES
   //  Eeprom-update
@@ -145,6 +129,11 @@
       #define NestClose_hour_address         19
       #define NestClose_minute_address       20    
 
+//DISTRIBUTION OF I2C ADRESSES
+
+  //  Real time clock DS3231
+      #define DS3231_I2C_ADDRESS 0x68
+
 //DECLARATION OF GLOBAL VARIABLES AND SETTING SOME VALUES (SETTINGS)
     
   //  Activate debugging messages in serial screen - set to true to debug (Warning: if all is activated, dynamic memory will overload)
@@ -155,8 +144,8 @@
       const bool SerialDebugStatus = false;
       
   //  Constants and preset values for timer-variables (values used, when nothing has yet been saved in EEPROM, or if code overwriting EEPROM status variable is activated in setup-routine)
-      
-      //Light
+          
+      //Light      
       #define LightOnMorning_set_preset     0 // Values: 1 = Time set below, 0 = Time set automatically to turn on in the morning if needed (using TimeWithLight_hours), 2 = Disabled - turn on manually
       #define LightOnMorning_hour_preset    5
       #define LightOnMorning_minute_preset  30
@@ -212,17 +201,35 @@
       const int NestOpenProcessing_seconds = 30; //Time to run open routine 
       const int NestCloseProcessing_seconds = 30; //Time to run close routine
 
+  //  Time - variables used to display and change time from menus
+      byte Time_hour;
+      byte Time_minute;
+      byte Time_day;
+      byte Time_month;
+      int Time_year;
+  
   //  Location (used by TimeLord-library to calculate sunrise and sunset times)
       const float Lattitude = 55.783748, Longitude = 11.939181; //Currently set to position of Skibby, Denmark - change if location is changed - and change values for civil twilight in setup_sun()!
 
   //  Intensity of backgrund light on reset - set a number between 0 and 255
       const int DisplayLightIntensity = 120;
 
-  //  KeyPad and display fuctions
+  //  KeyPad and display
       int  SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
-      int MenuReset = 50; // Seconds before menu exits,so loop can continue. If value is to high, system will reset (don´t know why...)
+      int MenuReset = 50; // Seconds before menu exits, so loop can continue. If value is to high, system will reset (don´t know why...)
+
+      #define MenuMax     7  //Defines number of menues
+      
+      #define Lines_menu1 2  // Define number of lines in each menu
+      #define Lines_menu2 8    
+      #define Lines_menu3 8
+      #define Lines_menu4 7
+      #define Lines_menu5 6
+      #define Lines_menu6 6
+      #define Lines_menu7 7
 
 //DECLARATION OF SOME ADDITIONAL GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
+
   //  Calculated in Setup_sun()
       time_t TodaysSunRise_t; 
       time_t TodaysSunSet_t;
@@ -276,7 +283,7 @@
       byte NestClose_set = EEPROM.read(NestClose_set_address);
       byte NestClose_hour = EEPROM.read(NestClose_hour_address);
       byte NestClose_minute = EEPROM.read(NestClose_minute_address);
-
+      
   //  Used in Input_keypad and Display_menu functions
       int KeyStatus = 0;
       int KeyValue = 0;     
@@ -295,14 +302,7 @@
       
       byte DoorActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
       byte NestActualPosition = 0; //Values: 0 = Unkonown; 1 = Open; 2 = Closed;
-      
-  /*
-  //  For temperature sensor
-      OneWire oneWire(Temp_PWM); 
-      DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature.
-      float temp = sensors.getTempCByIndex(0);
-      */
-      
+            
   //  From Setup_reset functions
       time_t ResetTime_t;
       time_t MenuReset_t;
@@ -312,10 +312,7 @@
 
 //SETUP ROUTINE - runs only once    
 void setup()
-{
-  //  Starting I2C communication by Wire-library  
-      Setup_i2c();
-  
+{  
   //  Define PINs as input/output
       Setup_pins();       
         
@@ -325,19 +322,16 @@ void setup()
   //  Initiate LCD, set background light intensity and define special characters
       Setup_LCD();
           
-  //  Temperature
-      //sensors.begin();
-      
-  //  Upload initial time on DS3231 - after setting time, disable line in code and upload again - otherwise the time will be reset to the time entered below every time arduino resets!
-      //Setup_time_initial(00,4,0,1,30,11,20); // Key: (seconds, minutes, hours, weekday (1=Sunday, 7=Saturday), date, month, year)
-      //ALWAYS SET TO NORMAL TIME, NOT TAKING DAYLIGHT SAVING TIME INTO ACCOUNT - in between last sunday of march and last sunday of october, one hour should be substracted from time on your watch
-               
   //  Get values from EEPROM
-      //Eeprom_status = 0; // Force EEPROM to reset to preset values above  - Values of adress 0: 1 = eeprom is updated, 0 = Save preset values agian - RESTART to have them loaded into RAM 2 = Update EPROM new time-values set by Keypad
+      //Eeprom_status = 0; // 0 = Force EEPROM to reset to preset values above  - Values of adress 0: 1 = Take user saved values from eeprom, 0 = Save preset values to eeprom agian - RESTART to have them loaded into RAM 2 = Update eeprom with new time-values set by Keypad
       Setup_eeprom();
   
-  //  Sync time from DS3231
-      Setup_time_sync();
+  //  Upload initial time on DS3231 - after setting time, disable theese two lines in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
+      //setTime(12, 30, 0, 15, 3, 21); // Key: Hour, minute, second, day, month, year
+      //Setup_DS3231_fra_arduino_time();
+      
+  //  Get time from DS3231
+      Setup_arduino_from_DS3231_time();
   
   //  Setup arduino to reset at 00:00:00 the following day
       Setup_reset();
@@ -352,7 +346,6 @@ void setup()
       Setup_light_timer();
       Setup_door_timer();
       Setup_nest_timer();
-      //Display_temperature_LCD();
 }
 
 //PROGRAM - runs in loop - functions defined in other tabs
@@ -360,7 +353,7 @@ void loop()
 {
   //  Check to se, if it is time to reset Arduino - if not, watch dog timer is reset - this also prevents Arduino to fuck up, sinse it resets every 8 seconds if this function is not called
       Reset_watchdog_timer();
-      
+  
   //  Check keypad, timers, display status and initate events
       Initiate_light_event(); 
       
@@ -369,12 +362,11 @@ void loop()
       Initiate_nest_event();
       
       Input_keypad();
-      
-  //  Get temperature from DS18B20
-      //Input_temp();
-      
+
+  //  Refresh LCD to show current menu
       Display_menu();
 }
+
 
 //GENERAL UTILITY FUNCTIONS
 
