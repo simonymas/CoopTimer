@@ -218,6 +218,7 @@
       int  SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
       int MenuReset = 50; // Seconds before menu exits, so loop can continue. If value is to high, system will reset (don´t know why...)
 
+  //  Menu structure
       #define MenuMax     7  //Defines number of menues
       
       #define Lines_menu1 2  // Define number of lines in each menu

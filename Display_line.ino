@@ -31,7 +31,7 @@
           case 28: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
           //Menu 3 lines - TIMERS DISPLAY
-          case 31: LCD.setCursor(0,Line);LCD.print("TIMERE          ");break;
+          case 31: LCD.setCursor(0,Line);LCD.print("AKTUELLE TIMERE ");break;
           case 32: LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(1); break;
           case 33: LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(2); break;
           case 34: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(1); break;
