@@ -14,7 +14,9 @@
     }
     if (LightOnMorning_set == 0)
     {
-      LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds;
+      if (LightOffEvening_set == 0) {LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds/2;}
+      if (LightOffEvening_set == 1) {LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds-(LightOffEvening_t-TodaysSunSet_t);}
+      else {LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds;}
     } 
       
   //Morning light OFF
@@ -42,9 +44,11 @@
     {
       LightOffEvening_t = Time_t(LightOffEvening_hour, LightOffEvening_minute);
     }
-    else
+    if (LightOffEvening_set == 0)
     {
-      LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds;
+      if (LightOnMorning_set == 0) {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds/2;}
+      if (LightOnMorning_set == 1) {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds-(TodaysSunRise_t-LightOnMorning_t);} 
+      else {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds;}
     }
     Display_Setup_light_timer_serial();
     Display_sunrise_sunset_serial();
