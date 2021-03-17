@@ -1,5 +1,5 @@
 /******************************************************************
- Created - 15.03.2021
+ Created - 17.03.2021
  
  Project    : TIME CONTROLLER PROGRAM - cooptimer
  
@@ -146,7 +146,7 @@
   //  Constants and preset values for timer-variables (values used, when nothing has yet been saved in EEPROM, or if code overwriting EEPROM status variable is activated in setup-routine)
           
       //Light      
-      #define LightOnMorning_set_preset     0 // Values: 1 = Time set below, 0 = Time set automatically to turn on in the morning if needed (using TimeWithLight_hours), 2 = Disabled - turn on manually
+      #define LightOnMorning_set_preset     0 // Values: 1 = Time set below, 2 = Disabled - turn on manually, 0 = Time set automatically taking into account TimeWithLight-variables and evening light settings
       #define LightOnMorning_hour_preset    5
       #define LightOnMorning_minute_preset  30
 
@@ -163,7 +163,7 @@
       const byte LightOnEvening_hour = 20;
       const byte LightOnEvening_minute = 30;
       
-      const byte LightOffEvening_set = 2; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
+      const byte LightOffEvening_set = 2; // Values: 1 = Time set below, 2 = Disabled - turn off manually, 0 = Time set automatically taking into account TimeWithLight-variables and morning ligt settings
       const byte LightOffEvening_hour = 21;
       const byte LightOffEvening_minute = 55;
       
