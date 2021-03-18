@@ -1,5 +1,31 @@
 //CALCULATES INPUTS FROM KEYPAD
         
+  //  Calculate number of lines in the present menu      
+      byte Linemax_menu()
+      {
+       #define Lines_menu1  2  // Define number of lines in each menu
+       #define Lines_menu2  8    
+       #define Lines_menu3 10
+       #define Lines_menu4  9
+       #define Lines_menu5  9
+       #define Lines_menu6  8
+       #define Lines_menu7  8
+       #define Lines_menu8  7
+      
+       switch (Active_menu())
+       {
+        case 1: return Lines_menu1;
+        case 2: return Lines_menu2;
+        case 3: return Lines_menu3;
+        case 4: return Lines_menu4;
+        case 5: return Lines_menu5;
+        case 6: return Lines_menu6;
+        case 7: return Lines_menu7;
+        case 8: return Lines_menu8;
+        return 8;
+       }
+     }
+
   //  Update position from keypad input
       void Input_keypad()
       {
@@ -124,7 +150,7 @@
         CurSelect = 0;
         if (ValueChanged == 1)
         {
-         if (Active_menu() == 7) {Setup_arduino_from_menu_time();}
+         if (Active_menu() == 8) {Setup_arduino_from_menu_time();} //Set number of time menu here
          else
          {
           Eeprom_status = 2;
@@ -222,32 +248,6 @@
       }
       if (Cur == 1) {--Pos;}
      }
-
-//  Calculate number of lines in the present menu      
-    byte Linemax_menu()
-    {
-      #define Lines_menu1  2  // Define number of lines in each menu
-      #define Lines_menu2  8    
-      #define Lines_menu3 10
-      #define Lines_menu4  9
-      #define Lines_menu5  9
-      #define Lines_menu6  8
-      #define Lines_menu7  8
-      #define Lines_menu8  7
-      
-      switch (Active_menu())
-      {
-        case 1: return Lines_menu1;
-        case 2: return Lines_menu2;
-        case 3: return Lines_menu3;
-        case 4: return Lines_menu4;
-        case 5: return Lines_menu5;
-        case 6: return Lines_menu6;
-        case 7: return Lines_menu7;
-        case 8: return Lines_menu8;
-        return 8;
-      }
-    }
 
 //  Utility function: Adjust time_t for specific time (hour and minutes)
     time_t Adjust_time(byte Hour, byte Minute, int AddedValue)
