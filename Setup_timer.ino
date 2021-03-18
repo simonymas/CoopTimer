@@ -4,7 +4,7 @@
   
   void Setup_light_timer()
   {        
-  //Calculate time with electric light - determine, if light schuld be activated or not
+  //Calculate time with electric light - determine, if light should be activated or not
     TimeWithElectricLight_seconds = ((TimeWithLight_hour*60UL*60UL+TimeWithLight_minute*60UL)-TodaysSunSet_t+TodaysSunRise_t);
     
   //Morning light ON
@@ -17,26 +17,32 @@
       if (LightOffEvening_set == 0) {LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds/2;}
       if (LightOffEvening_set == 1) {LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds-(LightOffEvening_t-TodaysSunSet_t);}
       else {LightOnMorning_t = TodaysSunRise_t-TimeWithElectricLight_seconds;}
-    } 
+    }
       
   //Morning light OFF
-    if (LightOffMorning_set == 1) // Manual setting of opening times. Values: 1 = Manual, 0 = Automatic
+    if (LightOffMorning_set == 1)
     {
       LightOffMorning_t = Time_t(LightOffMorning_hour, LightOffMorning_minute);
     }
     else
     {
-      LightOffMorning_t = TodaysSunRise_t+LightOffDelayAfterSunRise_minutes*60;
+      LightOffMorning_t = TodaysSunRise_t-LightOffDelayAfterSunRise_minute*60;
     } 
   
+  //Morning dimmer ON
+    LightDimmerOnMorning_t = LightOnMorning_t-LightDimmerOnPrecedeLight_minute*60;
+  
+  //Morning dimmer OFF
+    LightDimmerOffMorning_t = LightOffMorning_t;
+  
   //Evening light ON
-    if (LightOnEvening_set == 1) // Values: 1 = Manual, 0 = Automatic
+    if (LightOnEvening_set == 1)
     {
       LightOnEvening_t = Time_t(LightOnEvening_hour, LightOnEvening_minute);
     }
     else
     {
-      LightOnEvening_t = TodaysSunSet_t+LightOnDelayAfterSunSet_minutes*60;
+      LightOnEvening_t = TodaysSunSet_t-LightOnPrecedeSunSet_minute*60;
     }
     
   //Evening light OFF
@@ -44,16 +50,22 @@
     {
       LightOffEvening_t = Time_t(LightOffEvening_hour, LightOffEvening_minute);
     }
-    if (LightOffEvening_set == 0)
     {
       if (LightOnMorning_set == 0) {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds/2;}
       if (LightOnMorning_set == 1) {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds-(TodaysSunRise_t-LightOnMorning_t);} 
       else {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds;}
     }
+
+  //Evening dimmer ON
+    LightDimmerOnEvening_t = LightOnEvening_t;
+  
+  //Evening dimmer OFF
+    LightDimmerOffEvening_t = LightOffEvening_t+LightDimmerOffDelayAfterLight_minute*60;  
+    
     Display_Setup_light_timer_serial();
     Display_sunrise_sunset_serial();
-   }
-   
+  } 
+  
   //Door
     void Setup_door_timer()
     {        

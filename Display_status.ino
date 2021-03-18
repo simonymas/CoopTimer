@@ -32,15 +32,7 @@
                   delay(SensitivityKeypad);
                   Input_keypad();
                   break;
-          case 8: LCD.print(" Automatisk lys ");
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  Reset_watchdog_timer();
-                  delay(SensitivityKeypad);
-                  Input_keypad();
-                  break;
+          case 8: break;
         }
        }
 

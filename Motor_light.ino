@@ -15,4 +15,16 @@
       digitalWrite(Relay_7,HIGH);
       digitalWrite(Relay_8,HIGH);
     }
-    
+
+//  Switching dimmer on
+    void Motor_on_dimmer_light()
+    {
+      //digitalWrite(Relay_?,LOW);
+    }
+
+//  Switching dimmer off
+    void Motor_off_dimmer_light()
+    {
+      Display_Motor_off_light_serial();
+      //digitalWrite(Relay_?, HIGH);
+    }

@@ -19,16 +19,16 @@
      Display_Check_light_status_serial();
      if (LightStatus == 7) return 7;
      if (LightStatus == 8) return 0;
-     if (TimeWithElectricLight_seconds <= 0) return 7; // Do not turn on light
+     if (TimeWithElectricLight_seconds <= 0) return 0; // Do not turn on light
      else
      {
-      // Morning should be turned on
-      if ((LightOnMorning_t <= now()) && (now()<LightOffMorning_t))
+      // Morning light should be on
+      if ((LightOnMorning_t <= now()) && (now()< LightOffMorning_t))
       {
        if (LightOnMorning_set == 2) return 5; // Turn light on manually
        else return 2;
       }
-       // Morning light should be turned off, and evening light schould not be turned on yet
+       // Morning light should be off, and evening light schould not be on yet
        if ((LightOffMorning_t <= now()) && (now() < LightOnEvening_t))
        {
         if (LightOffMorning_set == 2) return 6; // Turn light off manually

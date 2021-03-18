@@ -6,15 +6,15 @@
    LightStatus = Check_light_status();
    switch(LightStatus)
    {
-     case 0: Motor_off_light(); break;
-     case 1: Motor_off_light(); break;
-     case 2: Motor_on_light(); break;
-     case 3: Motor_off_light(); break;
-     case 4: Motor_on_light(); break;
-     case 5: break;
-     case 6: break;
-     case 7: Motor_on_light(); Display_notice_menu(Display_light_status, LightStatus); break;
-     case 8: Display_notice_menu(Display_light_status, LightStatus); break;
+     case 0: Motor_off_light(); break; // 0 = No light nedded
+     case 1: Motor_off_light(); break; // 1 = Morning light has not been turned on yet
+     case 2: Motor_on_light(); break;  // 2 = Morning light is turned on
+     case 3: Motor_off_light(); break; // 3 = Morning light has been turned off
+     case 4: Motor_on_light(); break;  // 4 = Evening light is turned on
+     case 5: break;                    // 5 = Turn light on manually
+     case 6: break;                    // 6 = Turn light off manually
+     case 7: Motor_on_light(); Display_notice_menu(Display_light_status, LightStatus); break; // 7 = Forces turn on
+     case 8: Display_notice_menu(Display_light_status, LightStatus); break;                   // 8 = Set back to automatic
      default: break;
    }
    Check_light_status();

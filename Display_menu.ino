@@ -27,7 +27,7 @@
         }         
        }
                                                 //OTHER MENUES
-       if (Pos == 71 && Cur == 2) {Setup_menu_time();}      //When entering time menu, update values to show
+       if (Pos == 81 && Cur == 2) {Setup_menu_time();}      //When entering time menu, update values to show
        
        if (Active_menu() > 1)                             
        {

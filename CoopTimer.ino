@@ -1,5 +1,5 @@
 /******************************************************************
- Created - 17.03.2021
+ Created - 18.03.2021
  
  Project    : TIME CONTROLLER PROGRAM - cooptimer
  
@@ -16,6 +16,7 @@
  This program is designes to control relays on the basis of timers and manual inputs on a keypad.
  Its features includes:
  * Timekeeping and setting timers
+ * Change timer menu to show evening tiers as well
  * Calculation of todays sunset and sunrise for automatic timekeeping
  * Control of 8 relays
  * Keypad and display for manual control and for chaning settings.
@@ -28,22 +29,26 @@
  * Serial debug - set to true or false
     
  SUGGESTED IMPROVEMENTS:
- * Enable reset to preset values from keypad
+ * Implement dimmer in Check_status() and Initiate_event();
+ * Assign relay for dimmer
+ * Make sure delays for light and dimmer light can only be set to positive values in Inut_keypad (make utility function) - because only bytes can be handeled in EEPROM, not int
+ * Make setting of delays for doors and nests available from keypad
+ * Make it possible to reset arduino to preset values from keypad
  
  HARDWARE:  
- *  Arduino Uno/Mega (disable code for the board, that is not relevant to you)
- *  Clock-mocule DS3231 (insert rechargeable battery LIR2032)
-        Power: 3.3V, ~3.0 microA
-        Pins: Connect to SCL and SDA on Arduino and supplied from 3.3 V outlet and GND on Arduino
-        Libraries: Wire.h, TimeLib.h v.7.2011
- *  Relay-module - 8 Realys in this version
-        Power: 5V, max. 575 mA - external supply
-        Pins: A8-15 (Arduino Mega), GND on arduino on pin side - seperate GND and power supply to VCC-JD from external power supply
- *  LCD Keypad Shield, DF Robot
-        Power: 5V, 20-40 mA
-        Pins: LCD D4-10, Keypad A0
-        Library: LiquidCrystal.h
- *  Lineary actuators (connected to Relay)
+ * Arduino Uno/Mega (disable code for the board, that is not relevant to you)
+ * Clock-mocule DS3231 (insert rechargeable battery LIR2032)
+      Power: 3.3V, ~3.0 microA
+      Pins: Connect to SCL and SDA on Arduino and supplied from 3.3 V outlet and GND on Arduino
+      Libraries: Wire.h, TimeLib.h v.7.2011
+ * Relay-module - 8 Realys in this version
+      Power: 5V, max. 575 mA - external supply
+      Pins: A8-15 (Arduino Mega), GND on arduino on pin side - seperate GND and power supply to VCC-JD from external power supply
+ * LCD Keypad Shield, DF Robot
+      Power: 5V, 20-40 mA
+      Pins: LCD D4-10, Keypad A0
+      Library: LiquidCrystal.h
+ * Lineary actuators (connected to Relay)
 
 ******************************************************************/
 
@@ -81,7 +86,7 @@
       #define Relay_8 00 //light
       */
 
-      //FOR ARDUINO MEGA
+      //FOR ARDUINO MEGA - NB! Redistrbute to assign relay for dimmer as well - and insert relay number in Motor_light()
       #define Relay_1 A8 //door
       #define Relay_2 A9 //door 
       #define Relay_3 A10 //nest
@@ -101,33 +106,47 @@
 
 //DISTRIBUTION OF EEPROM ADRESSES
   //  Eeprom-update
-      #define Eeprom_status_address           0 
+      #define Eeprom_status_address                       0 
       
   //  Light
-      #define LightOnMorning_set_address      1
-      #define LightOnMorning_hour_address     2
-      #define LightOnMorning_minute_address   3
-      #define LightOffMorning_set_address     4
-      #define LightOffMorning_hour_address    5
-      #define LightOffMorning_minute_address  6
-      #define TimeWithLight_hour_address      7
-      #define TimeWithLight_minute_address    8
+      #define LightOnMorning_set_address                  1
+      #define LightOnMorning_hour_address                 2
+      #define LightOnMorning_minute_address               3
+      #define LightOffMorning_set_address                 4
+      #define LightOffMorning_hour_address                5
+      #define LightOffMorning_minute_address              6
+
+      #define LightOffDelayAfterSunRise_minute_address    7
+      #define LightDimmerOnPrecedeLight_minute_address    8
+      
+      #define LightOnEvening_set_address                  9
+      #define LightOnEvening_hour_address                10
+      #define LightOnEvening_minute_address              11
+      #define LightOffEvening_set_address                12 
+      #define LightOffEvening_hour_address               13
+      #define LightOffEvening_minute_address             14   
+
+      #define LightOnPrecedeSunSet_minute_address          15
+      #define LightDimmerOffDelayAfterLight_minute_address 16
+      
+      #define TimeWithLight_hour_address                 17
+      #define TimeWithLight_minute_address               18
       
   //  Door
-      #define DoorOpen_set_address            9
-      #define DoorOpen_hour_address          10
-      #define DoorOpen_minute_address        11 
-      #define DoorClose_set_address          12
-      #define DoorClose_hour_address         13
-      #define DoorClose_minute_address       14   
+      #define DoorOpen_set_address                       19
+      #define DoorOpen_hour_address                      20
+      #define DoorOpen_minute_address                    21 
+      #define DoorClose_set_address                      22
+      #define DoorClose_hour_address                     23
+      #define DoorClose_minute_address                   24   
       
   //  Nest
-      #define NestOpen_set_address           15
-      #define NestOpen_hour_address          16
-      #define NestOpen_minute_address        17
-      #define NestClose_set_address          18
-      #define NestClose_hour_address         19
-      #define NestClose_minute_address       20    
+      #define NestOpen_set_address                       25
+      #define NestOpen_hour_address                      26
+      #define NestOpen_minute_address                    27
+      #define NestClose_set_address                      28
+      #define NestClose_hour_address                     29
+      #define NestClose_minute_address                   30    
 
 //DISTRIBUTION OF I2C ADRESSES
 
@@ -146,28 +165,31 @@
   //  Constants and preset values for timer-variables (values used, when nothing has yet been saved in EEPROM, or if code overwriting EEPROM status variable is activated in setup-routine)
           
       //Light      
-      #define LightOnMorning_set_preset     0 // Values: 1 = Time set below, 2 = Disabled - turn on manually, 0 = Time set automatically taking into account TimeWithLight-variables and evening light settings
-      #define LightOnMorning_hour_preset    5
-      #define LightOnMorning_minute_preset  30
+      
+      #define LightOnMorning_set_preset                   0 // Values: 1 = Time set below, 2 = Disabled - turn on manually, 0 = Time set automatically taking into account TimeWithLight-variables and evening light settings
+      #define LightOnMorning_hour_preset                  5
+      #define LightOnMorning_minute_preset               30
 
-      #define LightOffMorning_set_preset    0 // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
-      #define LightOffMorning_hour_preset   9
-      #define LightOffMorning_minute_preset 00
+      #define LightOffMorning_set_preset                  0 // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
+      #define LightOffMorning_hour_preset                 9
+      #define LightOffMorning_minute_preset              00
+
+      #define LightOffDelayAfterSunRise_minute_preset    30 // Used if timer is set automatically      
+      #define LightDimmerOnPrecedeLight_minute_preset    30 // Time dimmer precedes morning lights
       
-      const int LightOffDelayAfterSunRise_minutes = 30; // Used if timer is set automatically
-            
-      #define TimeWithLight_hour_preset    12
-      #define TimeWithLight_minute_preset   00
-      
-      const byte LightOnEvening_set = 2; // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn on manually
-      const byte LightOnEvening_hour = 20;
-      const byte LightOnEvening_minute = 30;
-      
-      const byte LightOffEvening_set = 2; // Values: 1 = Time set below, 2 = Disabled - turn off manually, 0 = Time set automatically taking into account TimeWithLight-variables and morning ligt settings
-      const byte LightOffEvening_hour = 21;
-      const byte LightOffEvening_minute = 55;
-      
-      const int LightOnDelayAfterSunSet_minutes = -15; // Used if timer is set automatically
+      #define LightOnEvening_set_preset                   2 // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - turn off manually
+      #define LightOnEvening_hour_preset                 16
+      #define LightOnEvening_minute_preset               30
+
+      #define LightOffEvening_set_preset                  2 //Values: 1 = Time set below, 2 = Disabled - turn off manually, 0 = Time set automatically taking into account TimeWithLight-variables and morning ligt settings
+      #define LightOffEvening_hour_preset                19
+      #define LightOffEvening_minute_preset              00
+
+      #define LightOnPrecedeSunSet_minute_preset          15 // Used if timer is set automatically
+      #define LightDimmerOffDelayAfterLight_minute_preset 30 // Time dimmer is turned off as a delay after evening lights are turned off
+                  
+      #define TimeWithLight_hour_preset                  12
+      #define TimeWithLight_minute_preset                00
       
       //Door
       #define DoorOpen_set_preset     0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - open manually
@@ -215,19 +237,8 @@
       const int DisplayLightIntensity = 120;
 
   //  KeyPad and display
-      int  SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
+      int SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
       int MenuReset = 50; // Seconds before menu exits, so loop can continue. If value is to high, system will reset (don´t know why...)
-
-  //  Menu structure
-      #define MenuMax     7  //Defines number of menues
-      
-      #define Lines_menu1 2  // Define number of lines in each menu
-      #define Lines_menu2 8    
-      #define Lines_menu3 8
-      #define Lines_menu4 7
-      #define Lines_menu5 6
-      #define Lines_menu6 6
-      #define Lines_menu7 7
 
 //DECLARATION OF SOME ADDITIONAL GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
 
@@ -241,15 +252,19 @@
       int TimeWithElectricLight_seconds;
       time_t LightOnMorning_t; 
       time_t LightOffMorning_t;
+      time_t LightDimmerOnMorning_t; 
+      time_t LightDimmerOffMorning_t;
       time_t LightOnEvening_t;
       time_t LightOffEvening_t;
+      time_t LightDimmerOnEvening_t;
+      time_t LightDimmerOffEvening_t;
       time_t DoorOpen_t;
       time_t DoorClose_t;
       time_t NestOpen_t;
       time_t NestClose_t;
 
   //  Calcultated in Input_keypad();
-      time_t Adjusted_time;
+      //time_t Adjusted_time; - think this is unnessesary...
 
   //  Define global variables and read values from EEPROM
       //Eeprom-update
@@ -263,6 +278,20 @@
       byte LightOffMorning_set = EEPROM.read(LightOffMorning_set_address);
       byte LightOffMorning_hour = EEPROM.read(LightOffMorning_hour_address);
       byte LightOffMorning_minute = EEPROM.read(LightOffMorning_minute_address);
+
+      byte LightOffDelayAfterSunRise_minute = EEPROM.read(LightOffDelayAfterSunRise_minute_address);
+      byte LightDimmerOnPrecedeLight_minute = EEPROM.read(LightDimmerOnPrecedeLight_minute_address);
+
+      byte LightOnEvening_set = EEPROM.read(LightOnEvening_set_address);
+      byte LightOnEvening_hour = EEPROM.read(LightOnEvening_hour_address);
+      byte LightOnEvening_minute = EEPROM.read(LightOnEvening_minute_address);
+      
+      byte LightOffEvening_set = EEPROM.read(LightOffEvening_set_address);
+      byte LightOffEvening_hour = EEPROM.read(LightOffEvening_hour_address);
+      byte LightOffEvening_minute = EEPROM.read(LightOffEvening_minute_address);
+
+      byte LightOnPrecedeSunSet_minute = EEPROM.read(LightOnPrecedeSunSet_minute_address);
+      byte LightDimmerOffDelayAfterLight_minute = EEPROM.read(LightDimmerOffDelayAfterLight_minute_address);
       
       byte TimeWithLight_hour = EEPROM.read(TimeWithLight_hour_address);
       byte TimeWithLight_minute = EEPROM.read(TimeWithLight_minute_address);
@@ -327,9 +356,8 @@ void setup()
       //Eeprom_status = 0; // 0 = Force EEPROM to reset to preset values above  - Values of adress 0: 1 = Take user saved values from eeprom, 0 = Save preset values to eeprom agian - RESTART to have them loaded into RAM 2 = Update eeprom with new time-values set by Keypad
       Setup_eeprom();
   
-  //  Upload initial time on DS3231 - after setting time, disable theese two lines in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
-      //setTime(12, 30, 0, 15, 3, 21); // Key: Hour, minute, second, day, month, year
-      //Setup_DS3231_fra_arduino_time();
+  //  Upload initial time on DS3231 - after setting time, disable this line in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
+      //setTime(12, 30, 0, 15, 3, 21);Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year
       
   //  Get time from DS3231
       Setup_arduino_from_DS3231_time();
