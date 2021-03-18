@@ -76,7 +76,7 @@
       }
       else
       {
-        DoorOpen_t = TodaysSunRise_t+DoorOpenDelayAfterSunRise_minutes*60;
+        DoorOpen_t = TodaysSunRise_t-DoorOpenPrecedeSunRise_minute*60;
       } 
   
     //Door closing
@@ -86,7 +86,7 @@
       }
       else
       {
-        DoorClose_t = TodaysCivilTwilightEvening_t+DoorCloseDelayAfterCivilTwilight_minutes*60;
+        DoorClose_t = TodaysCivilTwilightEvening_t+DoorCloseDelayAfterCivilTwilight_minute*60;
       }
       Display_Setup_door_timer_serial();
     }
@@ -101,8 +101,8 @@
       }
       else
       {
-        if (TodaysCivilTwilightMorning_t <= LightOnMorning_t) {NestOpen_t = TodaysCivilTwilightMorning_t+NestOpenDelayAfterCivilTwilight_minutes*60;}
-        if (TodaysCivilTwilightMorning_t > LightOnMorning_t) {NestOpen_t = LightOnMorning_t+NestOpenDelayAfterCivilTwilight_minutes*60;}
+        if (TodaysCivilTwilightMorning_t <= LightOnMorning_t) {NestOpen_t = TodaysCivilTwilightMorning_t+NestOpenPrecedeCivilTwilight_minute*60;}
+        if (TodaysCivilTwilightMorning_t > LightOnMorning_t) {NestOpen_t = LightOnMorning_t+NestOpenPrecedeCivilTwilight_minute*60;}
       } 
   
     //Nest closing
@@ -112,7 +112,7 @@
       }
       else
       {
-        NestClose_t = DoorClose_t+NestCloseDelayAfterDoorClose_minutes*60;
+        NestClose_t = TodaysSunSet_t-NestClosePrecedeSunSet_minute*60;
       }
       Display_Setup_nest_timer_serial();
     }

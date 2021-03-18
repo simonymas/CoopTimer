@@ -41,13 +41,20 @@
           EEPROM.put(DoorClose_hour_address, DoorClose_hour_preset);
           EEPROM.put(DoorClose_minute_address, DoorClose_minute_preset);
 
+          EEPROM.put(DoorOpenPrecedeSunRise_minute_address, DoorOpenPrecedeSunRise_minute_preset);
+          EEPROM.put(DoorCloseDelayAfterCivilTwilight_minute_address, DoorCloseDelayAfterCivilTwilight_minute_preset);
+
           //Nest
           EEPROM.put(NestOpen_set_address, NestOpen_set_preset);
           EEPROM.put(NestOpen_hour_address, NestOpen_hour_preset);
           EEPROM.put(NestOpen_minute_address, NestOpen_minute_preset);
+          
           EEPROM.put(NestClose_set_address, NestClose_set_preset);
           EEPROM.put(NestClose_hour_address, NestClose_hour_preset);
           EEPROM.put(NestClose_minute_address, NestClose_minute_preset);
+
+          EEPROM.put(NestOpenPrecedeCivilTwilight_minute_address, NestOpenPrecedeCivilTwilight_minute_preset);
+          EEPROM.put(NestClosePrecedeSunSet_minute_address, NestClosePrecedeSunSet_minute_preset);
         }
         
         if (Eeprom_status == 2)  
@@ -84,16 +91,24 @@
           EEPROM.put(DoorOpen_set_address, DoorOpen_set);
           EEPROM.put(DoorOpen_hour_address, DoorOpen_hour);
           EEPROM.put(DoorOpen_minute_address, DoorOpen_minute);
+          
           EEPROM.put(DoorClose_set_address, DoorClose_set);
           EEPROM.put(DoorClose_hour_address, DoorClose_hour);
           EEPROM.put(DoorClose_minute_address, DoorClose_minute);
-          
+
+          EEPROM.put(DoorOpenPrecedeSunRise_minute_address, DoorOpenPrecedeSunRise_minute);
+          EEPROM.put(DoorCloseDelayAfterCivilTwilight_minute_address, DoorCloseDelayAfterCivilTwilight_minute);
+
           //Nest
           EEPROM.put(NestOpen_set_address, NestOpen_set);
           EEPROM.put(NestOpen_hour_address, NestOpen_hour);
           EEPROM.put(NestOpen_minute_address, NestOpen_minute);
+          
           EEPROM.put(NestClose_set_address, NestClose_set);
           EEPROM.put(NestClose_hour_address, NestClose_hour);
           EEPROM.put(NestClose_minute_address, NestClose_minute);
+
+          EEPROM.put(NestOpenPrecedeCivilTwilight_minute_address, NestOpenPrecedeCivilTwilight_minute);
+          EEPROM.put(NestClosePrecedeSunSet_minute_address, NestClosePrecedeSunSet_minute);
         }
       }

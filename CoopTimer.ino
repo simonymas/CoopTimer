@@ -16,24 +16,20 @@
  This program is designes to control relays on the basis of timers and manual inputs on a keypad.
  Its features includes:
  * Timekeeping and setting timers
- * Change timer menu to show evening tiers as well
  * Calculation of todays sunset and sunrise for automatic timekeeping
  * Control of 8 relays
- * Keypad and display for manual control and for chaning settings.
+ * Keypad and display for manual control and for chaning settings
+ 
  In this version, the program is designed to manage a chicken coop with automatic lights as well as doors and nests operated by lineary actuators.
  
- USER INPUTS (SETTINGS IN CODE):
- * Default values at first upload - activate in Setup(), reset arduino and disabled in code before uploading again
- * Lounguitude and altitude - to determine times of sunset and sunrise
- * Default timer parameters and delays
- * Serial debug - set to true or false
+ ADJUSTMESTS IN CODE AT FIRST UPLOAD:
+ * Preset values - set and upload to EEPROM at first upload by activating code line in Setup(), resetting arduino and disabling line in code before uploading again
+ * Lounguitude and altitude - set values for your location in order to determine times of sunset and sunrise
+ * Processing times for door and nest actuators - set values according to your physical setup
+ * Serial debug - set to true if you need it
     
- SUGGESTED IMPROVEMENTS:
- * Implement dimmer in Check_status() and Initiate_event();
- * Assign relay for dimmer
- * Make sure delays for light and dimmer light can only be set to positive values in Inut_keypad (make utility function) - because only bytes can be handeled in EEPROM, not int
- * Make setting of delays for doors and nests available from keypad
- * Make it possible to reset arduino to preset values from keypad
+ SUGGESTED IMPROVEMENTS/MISSING PARTS:
+ * Assign relay for dimmer in CoopTimer.ino and Motor_light.ino
  
  HARDWARE:  
  * Arduino Uno/Mega (disable code for the board, that is not relevant to you)
@@ -138,16 +134,22 @@
       #define DoorOpen_minute_address                    21 
       #define DoorClose_set_address                      22
       #define DoorClose_hour_address                     23
-      #define DoorClose_minute_address                   24   
+      #define DoorClose_minute_address                   24
+
+      #define DoorOpenPrecedeSunRise_minute_address              25
+      #define DoorCloseDelayAfterCivilTwilight_minute_address    26
       
   //  Nest
-      #define NestOpen_set_address                       25
-      #define NestOpen_hour_address                      26
-      #define NestOpen_minute_address                    27
-      #define NestClose_set_address                      28
-      #define NestClose_hour_address                     29
-      #define NestClose_minute_address                   30    
+      #define NestOpen_set_address                       27
+      #define NestOpen_hour_address                      28
+      #define NestOpen_minute_address                    29
+      #define NestClose_set_address                      30
+      #define NestClose_hour_address                     31
+      #define NestClose_minute_address                   32
 
+      #define NestOpenPrecedeCivilTwilight_minute_address        33
+      #define NestClosePrecedeSunSet_minute_address              34
+      
 //DISTRIBUTION OF I2C ADRESSES
 
   //  Real time clock DS3231
@@ -188,21 +190,20 @@
       #define LightOnPrecedeSunSet_minute_preset          15 // Used if timer is set automatically
       #define LightDimmerOffDelayAfterLight_minute_preset 30 // Time dimmer is turned off as a delay after evening lights are turned off
                   
-      #define TimeWithLight_hour_preset                  12
+      #define TimeWithLight_hour_preset                  13
       #define TimeWithLight_minute_preset                00
       
       //Door
-      #define DoorOpen_set_preset     0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - open manually
-      #define DoorOpen_hour_preset    6
+      #define DoorOpen_set_preset      0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - open manually
+      #define DoorOpen_hour_preset     6
       #define DoorOpen_minute_preset  30
-  
-      const int DoorOpenDelayAfterSunRise_minutes = -15; // Used if timer is set automatically - delay after sun has risen
 
-      #define DoorClose_set_preset    0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
+      #define DoorClose_set_preset     0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
       #define DoorClose_hour_preset   17
       #define DoorClose_minute_preset 17    
                 
-      const int DoorCloseDelayAfterCivilTwilight_minutes = 20; // Used if timer is set automatically. Civil twilight is 37-62 minutes after sunset at altitude of Denmark - less at 23 of october and december,and more at 23 rd of june and december
+      #define DoorOpenPrecedeSunRise_minute_preset           15 // Used if timer is set automatically - delay after sun has risen
+      #define DoorCloseDelayAfterCivilTwilight_minute_preset 20 // Used if timer is set automatically. Civil twilight is 37-62 minutes after sunset at altitude of Denmark - less at 23 of october and december,and more at 23 rd of june and decembe
       
       const int DoorOpenProcessing_seconds = 40; //Time to open fully, when door is fully closed
       const int DoorCloseProcessing_seconds = 80; //Time to close door
@@ -211,14 +212,13 @@
       #define NestOpen_set_preset     0   // Values: 1 = Time set below, 0 = Time set automatically (at time of light), 2 = Disabled - open manually
       #define NestOpen_hour_preset    5
       #define NestOpen_minute_preset  0 
-      
-      const int NestOpenDelayAfterCivilTwilight_minutes = 0; // Used if timer is set automatically - delay after the minimum amount of light set has tuned on - or civil twilight, if this is earlier
 
       #define NestClose_set_preset    1   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - close manually
       #define NestClose_hour_preset   14
       #define NestClose_minute_preset 30
-      
-      const int NestCloseDelayAfterDoorClose_minutes = -60; // Used if timer is set automatically - time to wait to close nests after doors have closed
+
+      #define NestOpenPrecedeCivilTwilight_minute_preset 0 // Used if timer is set automatically - delay after the minimum amount of light set has tuned on - or civil twilight, if this is earlier
+      #define NestClosePrecedeSunSet_minute_preset      60 // Used if timer is set automatically - time to wait to close nests after doors have closed
       
       const int NestOpenProcessing_seconds = 30; //Time to run open routine 
       const int NestCloseProcessing_seconds = 30; //Time to run close routine
@@ -238,7 +238,7 @@
 
   //  KeyPad and display
       int SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
-      int MenuReset = 50; // Seconds before menu exits, so loop can continue. If value is to high, system will reset (don´t know why...)
+      int MenuReset = 30; // Seconds before menu exits, so loop can continue. If value is to high, system will reset (don´t know why...)
 
 //DECLARATION OF SOME ADDITIONAL GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
 
@@ -304,7 +304,10 @@
       byte DoorClose_set = EEPROM.read(DoorClose_set_address);
       byte DoorClose_hour = EEPROM.read(DoorClose_hour_address);
       byte DoorClose_minute = EEPROM.read(DoorClose_minute_address);
-      
+
+      byte DoorOpenPrecedeSunRise_minute = EEPROM.read(DoorOpenPrecedeSunRise_minute_address);
+      byte DoorCloseDelayAfterCivilTwilight_minute = EEPROM.read(DoorCloseDelayAfterCivilTwilight_minute_address);
+            
       //Nest
       byte NestOpen_set = EEPROM.read(NestOpen_set_address);
       byte NestOpen_hour = EEPROM.read(NestOpen_hour_address);
@@ -313,6 +316,9 @@
       byte NestClose_set = EEPROM.read(NestClose_set_address);
       byte NestClose_hour = EEPROM.read(NestClose_hour_address);
       byte NestClose_minute = EEPROM.read(NestClose_minute_address);
+
+      byte NestOpenPrecedeCivilTwilight_minute = EEPROM.read(NestOpenPrecedeCivilTwilight_minute_address);
+      byte NestClosePrecedeSunSet_minute = EEPROM.read(NestClosePrecedeSunSet_minute_address);
       
   //  Used in Input_keypad and Display_menu functions
       int KeyStatus = 0;

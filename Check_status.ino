@@ -49,6 +49,20 @@
      Display_light_status_serial();  
      }
  
+  //Check dimmer light status - Values: 0 = Turn dimmer light off, 1 = Turn dimmer ligt on 
+
+  byte Check_dimmer_status()
+  {
+     if (TimeWithElectricLight_seconds <= 0) return 0; // Do not turn on dimmer light
+     else
+     {
+      // Morning dimmer light should be on
+      if ((LightDimmerOnMorning_t <= now()) && (now()< LightDimmerOffMorning_t)) return 1; //Turn light on
+      if ((LightDimmerOnEvening_t <= now()) && (now()< LightDimmerOffEvening_t)) return 1; //Turn light on
+      else return 0; //Turn light off
+      }
+   }
+    
   //Check door status - values:
     /*
     Status   Actual position          Expected posision    Action            lcd TEXT

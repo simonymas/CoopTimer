@@ -164,8 +164,8 @@
                  LightOffMorning_hour = hour(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x*10));
                  LightOffMorning_minute = minute(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x*10));
                  break;
-       case 47:  LightOffDelayAfterSunRise_minute = LightOffDelayAfterSunRise_minute+x; break;
-       case 48:  LightDimmerOnPrecedeLight_minute = LightDimmerOnPrecedeLight_minute+x; break;
+       case 47:  LightOffDelayAfterSunRise_minute = Adjust_pos_value(LightOffDelayAfterSunRise_minute, x); break;
+       case 48:  LightDimmerOnPrecedeLight_minute = Adjust_pos_value(LightDimmerOnPrecedeLight_minute, x); break;
 
        //EVENING LIGHT MENU       
        case 52:  LightOnEvening_set = Adjust_mode(LightOnEvening_set, x); break;
@@ -182,8 +182,8 @@
                  LightOffEvening_hour = hour(Adjust_time(LightOffEvening_hour, LightOffEvening_minute, x*10));
                  LightOffEvening_minute = minute(Adjust_time(LightOffEvening_hour, LightOffEvening_minute, x*10));
                  break;
-       case 57:  LightOnPrecedeSunSet_minute = LightOnPrecedeSunSet_minute+x; break;
-       case 58:  LightDimmerOffDelayAfterLight_minute = LightDimmerOffDelayAfterLight_minute+x; break;
+       case 57:  LightOnPrecedeSunSet_minute = Adjust_pos_value(LightOnPrecedeSunSet_minute, x); break;
+       case 58:  LightDimmerOffDelayAfterLight_minute = Adjust_pos_value(LightDimmerOffDelayAfterLight_minute, x); break;
 
        //DOOR MENU
        case 62:  DoorOpen_set = Adjust_mode(DoorOpen_set, x); break;
@@ -196,6 +196,8 @@
                  DoorClose_hour = hour(Adjust_time(DoorClose_hour, DoorClose_minute, x*10));
                  DoorClose_minute = minute(Adjust_time(DoorClose_hour, DoorClose_minute, x*10));
                  break;
+       case 66:  DoorOpenPrecedeSunRise_minute = Adjust_pos_value(DoorOpenPrecedeSunRise_minute,x);
+       case 67:  DoorCloseDelayAfterCivilTwilight_minute = Adjust_pos_value(DoorCloseDelayAfterCivilTwilight_minute,x);      
 
        //NEST MENU
        case 72:  NestOpen_set = Adjust_mode(NestOpen_set, x); break;
@@ -208,6 +210,8 @@
                  NestClose_hour = hour(Adjust_time(NestClose_hour, NestClose_minute, x*10));
                  NestClose_minute = minute(Adjust_time(NestClose_hour, NestClose_minute, x*10));
                  break;
+       case 76:  NestOpenPrecedeCivilTwilight_minute = Adjust_pos_value(NestOpenPrecedeCivilTwilight_minute,x);
+       case 77:  NestClosePrecedeSunSet_minute = Adjust_pos_value(NestClosePrecedeSunSet_minute,x);      
 
        //Time MENU
        case 82:  Time_hour = hour(Adjust_time(Time_hour, minute(), x*60)); break;
@@ -222,14 +226,14 @@
 //  Calculate number of lines in the present menu      
     byte Linemax_menu()
     {
-      #define Lines_menu1 2  // Define number of lines in each menu
-      #define Lines_menu2 8    
-      #define Lines_menu3 8
-      #define Lines_menu4 9
-      #define Lines_menu5 9
-      #define Lines_menu6 6
-      #define Lines_menu7 6
-      #define Lines_menu8 7
+      #define Lines_menu1  2  // Define number of lines in each menu
+      #define Lines_menu2  8    
+      #define Lines_menu3 10
+      #define Lines_menu4  9
+      #define Lines_menu5  9
+      #define Lines_menu6  8
+      #define Lines_menu7  8
+      #define Lines_menu8  7
       
       switch (Active_menu())
       {
@@ -287,4 +291,12 @@
      if (ModeNew > 2) {ModeNew = 0;}
      if (ModeNew < 0) {ModeNew = 2;}
      return ModeNew;
+    }
+
+//  Utility function: Adjust number, only allowing positive values
+    byte Adjust_pos_value(byte ValueLast, int AddedValue)
+    {
+     int ValueNew = ValueLast+AddedValue;
+     if (ValueNew >= 0) {return ValueNew;}
+     if (ValueNew < 0) {return ValueLast;}
     }

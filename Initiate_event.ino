@@ -19,6 +19,17 @@
    }
    Check_light_status();
   }
+
+  void Initiate_dimmer_event()
+  {
+    byte DimmerStatus = Check_dimmer_status();
+    switch(DimmerStatus)
+    {
+      case 0: Motor_off_dimmer_light(); break;
+      case 1: Motor_on_dimmer_light(); break;
+      default: break;
+    }
+  }
   
   void Initiate_door_event()
   {

@@ -32,13 +32,31 @@
 
           //Menu 3 lines - TIMERS DISPLAY
           case 31: LCD.setCursor(0,Line);LCD.print("AKTUELLE TIMERE ");break;
-          case 32: LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(1); break;
-          case 33: LCD.setCursor(0,Line);LCD.print(" ");Display_light_status(2); break;
+          case 32: 
+                   LCD.setCursor(0,Line);LCD.print(" Morgenlys:");
+                   if (LightOnMorning_set == 2) {LCD.print("  Fra");break;}
+                   if (LightOnMorning_set == 1) {LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute); break;}
+                   if (LightOnMorning_set == 0)
+                   {
+                    if (TimeWithElectricLight_seconds > 0) {LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute); break;}
+                    if (TimeWithElectricLight_seconds <= 0) {LCD.print("  Fra");break;} 
+                   }
+          case 33:
+                   LCD.setCursor(0,Line);LCD.print(" Aftenlys: ");
+                   if (LightOffEvening_set == 2) {LCD.print("  Fra");break;}
+                   if (LightOffEvening_set == 1) {LCDprintDigits(LightOffEvening_hour); LCD.print(":"); LCDprintDigits(LightOffEvening_minute); break;}
+                   if (LightOffEvening_set == 0)
+                   {
+                    if (TimeWithElectricLight_seconds > 0) {LCDprintDigits(LightOffEvening_hour); LCD.print(":"); LCDprintDigits(LightOffEvening_minute); break;}
+                    if (TimeWithElectricLight_seconds <= 0) {LCD.print("  Fra");break;} 
+                   }
           case 34: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(1); break;
           case 35: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(4);break;
           case 36: LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(1);break;
           case 37: LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(4);break;
-          case 38: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
+          case 38: LCD.setCursor(0,Line);LCD.print(" Solopg.:  "); LCDprintDigits(hour(TodaysSunRise_t)); LCD.print(":"); LCDprintDigits(minute(TodaysSunRise_t));break;
+          case 39: LCD.setCursor(0,Line);LCD.print(" Solnedg.: "); LCDprintDigits(hour(TodaysSunSet_t)); LCD.print(":"); LCDprintDigits(minute(TodaysSunSet_t));break;
+          case 40: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
           //Menu 4 lines - MORNING LIGHT MENU
           case 41: LCD.setCursor(0,Line);LCD.print("INDST. MORGENLYS");break;
@@ -68,7 +86,9 @@
           case 63: LCD.setCursor(0,Line);LCD.print(" Luk mode: ");Display_mode_status(DoorClose_set);break;
           case 64: LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.write(3);LCD.print("bn:  "); LCDprintDigits(DoorOpen_hour); LCD.print(":"); LCDprintDigits(DoorOpen_minute); break;
           case 65: LCD.setCursor(0,Line);LCD.print(" D");LCD.print(char(2));LCD.print("r ");LCD.print("luk:  "); LCDprintDigits(DoorClose_hour); LCD.print(":"); LCDprintDigits(DoorClose_minute); break;
-          case 66: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
+          case 66: LCD.setCursor(0,Line);LCD.print(" Solopg.-:   "); LCD.print(":"); LCDprintDigits(DoorOpenPrecedeSunRise_minute); break;
+          case 67: LCD.setCursor(0,Line);LCD.print(" Tusm");LCD.write(5);LCD.print("rke+:  "); LCD.print(":"); LCDprintDigits(DoorCloseDelayAfterCivilTwilight_minute); break;
+          case 68: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
           //Menu 7 lines - NEST MENU
           case 71: LCD.setCursor(0,Line);LCD.print("INDSTIL REDE    ");break;
@@ -76,7 +96,9 @@
           case 73: LCD.setCursor(0,Line);LCD.print(" Luk mode: ");Display_mode_status(NestClose_set);break;
           case 74: LCD.setCursor(0,Line);LCD.print(" Rede ");LCD.write(3);LCD.print("bn: "); LCDprintDigits(NestOpen_hour); LCD.print(":"); LCDprintDigits(NestOpen_minute); break;
           case 75: LCD.setCursor(0,Line);LCD.print(" Rede ");;LCD.print("luk: "); LCDprintDigits(NestClose_hour); LCD.print(":"); LCDprintDigits(NestClose_minute); break;
-          case 76: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
+          case 76: LCD.setCursor(0,Line);LCD.print(" Tusm");LCD.write(5);LCD.print("rke-:  "); LCD.print(":"); LCDprintDigits(NestOpenPrecedeCivilTwilight_minute); break;
+          case 77: LCD.setCursor(0,Line);LCD.print(" Solnedg.-:  "); LCD.print(":"); LCDprintDigits(NestClosePrecedeSunSet_minute); break;
+          case 78: LCD.setCursor(0,Line);LCD.print(" EXIT MENU      ");break;
 
           //Menu 8 lines - TIME MENU
           case 81: LCD.setCursor(0,Line);LCD.print("INDSTIL TID     ");break;
