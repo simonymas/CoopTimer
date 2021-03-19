@@ -363,7 +363,7 @@ void setup()
       Setup_eeprom();
   
   //  Upload initial time on DS3231 - after setting time, disable this line in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
-      //setTime(12, 30, 0, 15, 3, 21);Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year
+      //setTime(13, 23, 0, 18, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year
       
   //  Get time from DS3231
       Setup_arduino_from_DS3231_time();
@@ -378,9 +378,7 @@ void setup()
       Setup_sun();
  
   //  Set timers and light
-      Setup_light_timer();
-      Setup_door_timer();
-      Setup_nest_timer();
+      Setup_timer();
 }
 
 //PROGRAM - runs in loop - functions defined in other tabs
@@ -390,12 +388,7 @@ void loop()
       Reset_watchdog_timer();
   
   //  Check keypad, timers, display status and initate events
-      Initiate_light_event(); 
-      
-      Initiate_door_event();
-      
-      Initiate_nest_event();
-      
+      Initiate_event(); 
       Input_keypad();
 
   //  Refresh LCD to show current menu

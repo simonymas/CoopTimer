@@ -1,5 +1,13 @@
 //DETERMINES THE STATUS OF LIGHT, DOOR AND NESTS. STATUS IS USED TO DETERMINE, IF EVENTS SCHOULD BE INITIATED
 
+void Check_status()
+{
+  Check_light_status();
+  Check_dimmer_status();
+  Check_door_status();
+  Check_nest_status();
+}
+
  //Check light status
  /*
   Values:

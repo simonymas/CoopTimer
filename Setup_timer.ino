@@ -1,5 +1,13 @@
 //SET TIMERS
 
+void Setup_timer()
+{
+  Setup_light_timer();
+  Setup_dimmer_timer();
+  Setup_door_timer();
+  Setup_nest_timer();
+}
+
 //Light
   
   void Setup_light_timer()
@@ -29,12 +37,6 @@
       LightOffMorning_t = TodaysSunRise_t-LightOffDelayAfterSunRise_minute*60;
     } 
   
-  //Morning dimmer ON
-    LightDimmerOnMorning_t = LightOnMorning_t-LightDimmerOnPrecedeLight_minute*60;
-  
-  //Morning dimmer OFF
-    LightDimmerOffMorning_t = LightOffMorning_t;
-  
   //Evening light ON
     if (LightOnEvening_set == 1)
     {
@@ -55,16 +57,18 @@
       if (LightOnMorning_set == 1) {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds-(TodaysSunRise_t-LightOnMorning_t);} 
       else {LightOffEvening_t = TodaysSunSet_t+TimeWithElectricLight_seconds;}
     }
-
-  //Evening dimmer ON
-    LightDimmerOnEvening_t = LightOnEvening_t;
-  
-  //Evening dimmer OFF
-    LightDimmerOffEvening_t = LightOffEvening_t+LightDimmerOffDelayAfterLight_minute*60;  
-    
     Display_Setup_light_timer_serial();
     Display_sunrise_sunset_serial();
   } 
+
+  //Dimmer
+  void Setup_dimmer_timer()
+  {
+    LightDimmerOnMorning_t = LightOnMorning_t-LightDimmerOnPrecedeLight_minute*60;
+    LightDimmerOffMorning_t = LightOffMorning_t;
+    LightDimmerOnEvening_t = LightOnEvening_t;
+    LightDimmerOffEvening_t = LightOffEvening_t+LightDimmerOffDelayAfterLight_minute*60;  
+  }
   
   //Door
     void Setup_door_timer()

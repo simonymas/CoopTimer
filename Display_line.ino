@@ -178,8 +178,6 @@
         delay(Delay);
         LCD.print(".");
         delay(Delay);
-        LCD.print(".");
-        delay(Delay);
         Reset_watchdog_timer();
         Display_Display_update_serial();
         Display_empty();

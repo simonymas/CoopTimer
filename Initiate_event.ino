@@ -1,4 +1,12 @@
 //CONTROL TIMERS OF LIGHT SWICH
+
+  void Initiate_event()
+  {
+    Initiate_light_event();
+    Initiate_dimmer_event();
+    Initiate_door_event();
+    Initiate_nest_event();
+  }
   
   void Initiate_light_event()
   {
