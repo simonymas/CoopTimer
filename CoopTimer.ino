@@ -190,8 +190,8 @@
       #define LightOnPrecedeSunSet_minute_preset          15 // Used if timer is set automatically
       #define LightDimmerOffDelayAfterLight_minute_preset 30 // Time dimmer is turned off as a delay after evening lights are turned off
                   
-      #define TimeWithLight_hour_preset                  13
-      #define TimeWithLight_minute_preset                00
+      #define TimeWithLight_hour_preset                   13
+      #define TimeWithLight_minute_preset                 00
       
       //Door
       #define DoorOpen_set_preset      0   // Values: 1 = Time set below, 0 = Time set automatically, 2 = Disabled - open manually
@@ -236,9 +236,18 @@
   //  Intensity of backgrund light on reset - set a number between 0 and 255
       const int DisplayLightIntensity = 120;
 
-  //  KeyPad and display
+  //  KeyPad and manu structure
       int SensitivityKeypad = 500; //  Set sensitivity of buttons on keypad in miliseconds - don't exceed 500 not to trigger Watchdog reset
       int MenuReset = 30; // Seconds before menu exits, so loop can continue. If value is to high, system will reset (don´t know why...)
+
+      #define Lines_menu1  2  // Define number of lines in each menu - max. 10 lines
+      #define Lines_menu2  8    
+      #define Lines_menu3 10
+      #define Lines_menu4  7
+      #define Lines_menu5  7
+      #define Lines_menu6  6
+      #define Lines_menu7  6
+      #define Lines_menu8  7
 
 //DECLARATION OF SOME ADDITIONAL GLOBAL VARIABLES USED BY THE FUNCTIONS - don't cahnge!
 
@@ -262,9 +271,6 @@
       time_t DoorClose_t;
       time_t NestOpen_t;
       time_t NestClose_t;
-
-  //  Calcultated in Input_keypad();
-      //time_t Adjusted_time; - think this is unnessesary...
 
   //  Define global variables and read values from EEPROM
       //Eeprom-update
@@ -363,7 +369,7 @@ void setup()
       Setup_eeprom();
   
   //  Upload initial time on DS3231 - after setting time, disable this line in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
-      //setTime(13, 23, 0, 18, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year
+      setTime(13, 23, 0, 18, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year
       
   //  Get time from DS3231
       Setup_arduino_from_DS3231_time();
@@ -378,7 +384,9 @@ void setup()
       Setup_sun();
  
   //  Set timers and light
-      Setup_timer();
+      Setup_light_timer();
+      Setup_door_timer();
+      Setup_nest_timer();
 }
 
 //PROGRAM - runs in loop - functions defined in other tabs
@@ -388,7 +396,12 @@ void loop()
       Reset_watchdog_timer();
   
   //  Check keypad, timers, display status and initate events
-      Initiate_event(); 
+      Initiate_light_event(); 
+      
+      Initiate_door_event();
+      
+      Initiate_nest_event();
+      
       Input_keypad();
 
   //  Refresh LCD to show current menu

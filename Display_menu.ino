@@ -4,9 +4,6 @@
       void Display_menu()
       {     
        if (Active_menu() > 1)
-       {
-        if (PosLast < 20) {Setup_menu_reset();}   //When navigating to menu 2, 3, etc. timer is set
-       }
        Reset_menu();                              //Check to se if it is time to reset to menu 1 
      
        if (Active_menu() == 1)                    //MENU 1 line 1
