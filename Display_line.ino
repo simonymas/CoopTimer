@@ -34,24 +34,34 @@
           case 31: LCD.setCursor(0,Line);LCD.print("AKTUELLE TIMERE ");break;
           case 32: 
                    LCD.setCursor(0,Line);LCD.print(" Morgenlys ");
-                   if (LightOnMorning_set == 2) {LCD.print("  Fra");break;}
-                   if (LightOnMorning_set == 1) {LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute); break;}
+                   if (LightOnMorning_set == 2) {LCD.print("  Fra");}
+                   if (LightOnMorning_set == 1) {LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute);}
                    if (LightOnMorning_set == 0)
                    {
-                    if (TimeWithElectricLight_seconds > 0) {LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute); break;}
-                    if (TimeWithElectricLight_seconds <= 0) {LCD.print("  Fra");break;} 
+                    if (TimeWithElectricLight_seconds > 0) {LCDprintDigits(LightOnMorning_hour); LCD.print(":"); LCDprintDigits(LightOnMorning_minute);}
+                    if (TimeWithElectricLight_seconds <= 0) {LCD.print("  Fra");} 
                    }
+                   break;
           case 33:
                    LCD.setCursor(0,Line);LCD.print(" Aftenlys  ");
-                   if (LightOffEvening_set == 2) {LCD.print("  Fra");break;}
-                   if (LightOffEvening_set == 1) {LCDprintDigits(LightOffEvening_hour); LCD.print(":"); LCDprintDigits(LightOffEvening_minute); break;}
+                   if (LightOffEvening_set == 2) {LCD.print("  Fra");}
+                   if (LightOffEvening_set == 1) {LCDprintDigits(LightOffEvening_hour); LCD.print(":"); LCDprintDigits(LightOffEvening_minute);}
                    if (LightOffEvening_set == 0)
                    {
-                    if (TimeWithElectricLight_seconds > 0) {LCDprintDigits(LightOffEvening_hour); LCD.print(":"); LCDprintDigits(LightOffEvening_minute); break;}
-                    if (TimeWithElectricLight_seconds <= 0) {LCD.print("  Fra");break;} 
+                    if (TimeWithElectricLight_seconds > 0) {LCDprintDigits(LightOffEvening_hour); LCD.print(":"); LCDprintDigits(LightOffEvening_minute);}
+                    if (TimeWithElectricLight_seconds <= 0) {LCD.print("  Fra");} 
                    }
-          case 34: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(1); break;
-          case 35: LCD.setCursor(0,Line);LCD.print(" ");Display_door_status(4);break;
+                   break;
+          case 34: 
+                   LCD.setCursor(0,Line);LCD.print(" D"); LCD.print(char(2)); LCD.print("r "); LCD.print(char(3)); LCD.print ("bn   ");
+                   if (DoorOpen_set == 2) {LCD.print("  Fra");}
+                   if (DoorOpen_set < 2) {LCDprintDigits(hour(DoorOpen_t)); LCD.print(":");LCDprintDigits(minute(DoorOpen_t));}
+                   break;
+          case 35: 
+                   LCD.setCursor(0,Line);LCD.print(" D"); LCD.print(char(2)); LCD.print("r ");LCD.print ("luk   ");
+                   if (DoorClose_set == 2) {LCD.print("  Fra");}
+                   if (DoorClose_set < 2) {LCDprintDigits(hour(DoorClose_t)); LCD.print(":");LCDprintDigits(minute(DoorClose_t));}
+                   break;
           case 36: LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(1);break;
           case 37: LCD.setCursor(0,Line);LCD.print(" ");Display_nest_status(4);break;
           case 38: LCD.setCursor(0,Line);LCD.print(" Solopg.   "); LCDprintDigits(hour(TodaysSunRise_t)); LCD.print(":"); LCDprintDigits(minute(TodaysSunRise_t));break;

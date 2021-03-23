@@ -181,6 +181,7 @@
                   LightOnMorning_minute = minute(Adjust_time(LightOnMorning_hour, LightOnMorning_minute, x*10));    
                   break;
                  }
+                 else break;
        
        case 44:  LightOffMorning_set = Adjust_mode(LightOffMorning_set, x); break;                            
 
@@ -194,6 +195,8 @@
                   LightOffMorning_minute = minute(Adjust_time(LightOffMorning_hour, LightOffMorning_minute, x*10));
                   break;
                  }
+                 else break;
+                 
        case 46:  LightDimmerOnPrecedeLight_minute = Adjust_pos_value(LightDimmerOnPrecedeLight_minute, x); break;
 
        //EVENING LIGHT MENU       
@@ -211,6 +214,7 @@
                   LightOnEvening_minute = minute(Adjust_time(LightOnEvening_hour, LightOnEvening_minute, x*10));
                   break;
                  }
+                 else break;
        
        case 54:  LightOffEvening_set = Adjust_mode(LightOffEvening_set, x); break;                    
        
@@ -224,7 +228,8 @@
                   LightOffEvening_hour = hour(Adjust_time(LightOffEvening_hour, LightOffEvening_minute, x*10));
                   LightOffEvening_minute = minute(Adjust_time(LightOffEvening_hour, LightOffEvening_minute, x*10));
                   break;
-                 }    
+                 }
+                 else break;    
        
        case 56:  LightDimmerOffDelayAfterLight_minute = Adjust_pos_value(LightDimmerOffDelayAfterLight_minute, x); break;
 
@@ -241,6 +246,8 @@
                   DoorOpen_minute = minute(Adjust_time(DoorOpen_hour, DoorOpen_minute, x*10));    
                   break;
                  }
+                 else break;
+                 
        case 64:  DoorClose_set = Adjust_mode(DoorClose_set, x); break;       
                  
        case 65: if (DoorClose_set == 0)
@@ -253,6 +260,7 @@
                  DoorClose_minute = minute(Adjust_time(DoorClose_hour, DoorClose_minute, x*10));
                  break;
                 }
+                else break;
 
        //NEST MENU
        case 72:  NestOpen_set = Adjust_mode(NestOpen_set, x); break;
@@ -267,6 +275,7 @@
                   NestOpen_minute = minute(Adjust_time(NestOpen_hour, NestOpen_minute, x*10));    
                   break;
                  }
+                 else break;
                  
        case 74:  NestClose_set = Adjust_mode(NestClose_set, x); break;       
                  
@@ -279,7 +288,8 @@
                   NestClose_hour = hour(Adjust_time(NestClose_hour, NestClose_minute, x*10));
                   NestClose_minute = minute(Adjust_time(NestClose_hour, NestClose_minute, x*10));
                   break;
-                 }       
+                 }
+                 else break;       
 
        //Time MENU
        case 82:  Time_hour = hour(Adjust_time(Time_hour, minute(), x*60)); break;

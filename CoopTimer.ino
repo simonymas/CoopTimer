@@ -25,11 +25,12 @@
  ADJUSTMESTS IN CODE AT FIRST UPLOAD:
  * Preset values - set and upload to EEPROM at first upload by activating code line in Setup(), resetting arduino and disabling line in code before uploading again
  * Lounguitude and altitude - set values for your location in order to determine times of sunset and sunrise
+ * Adjust assignments of realys in Cooptimer.ino, Setup_pins and Motor_x-function
  * Processing times for door and nest actuators - set values according to your physical setup
- * Serial debug - set to true if you need it
+ * Serial debug - set to true if you need it.
     
- SUGGESTED IMPROVEMENTS/MISSING PARTS:
- * Assign relay for dimmer in CoopTimer.ino and Motor_light.ino
+ SUGGESTED IMPROVEMENTS / MISSING PARTS:
+ None at the moment...
  
  HARDWARE:  
  * Arduino Uno/Mega (disable code for the board, that is not relevant to you)
@@ -231,8 +232,9 @@
       int Time_year;
   
   //  Location (used by TimeLord-library to calculate sunrise and sunset times)
-      const float Lattitude = 55.783748, Longitude = 11.939181; //Currently set to position of Skibby, Denmark - change if location is changed - and change values for civil twilight in setup_sun()!
-
+      const float Lattitude = 55.783748; //Currently set to position of Skibby, Denmark - change if location is changed - and change values for civil twilight in setup_sun()!
+      const float Longitude = 11.939181;
+      
   //  Intensity of backgrund light on reset - set a number between 0 and 255
       const int DisplayLightIntensity = 120;
 

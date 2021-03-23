@@ -22,7 +22,7 @@
      case 5: break;                    // 5 = Turn light on manually
      case 6: break;                    // 6 = Turn light off manually
      case 7: Motor_on_light(); Display_notice_menu(Display_light_status, LightStatus); break; // 7 = Forces turn on
-     case 8: Display_notice_menu(Display_light_status, LightStatus); break;                   // 8 = Set back to automatic
+     case 8: break;                   // 8 = Set back to automatic
      default: break;
    }
    Check_light_status();
