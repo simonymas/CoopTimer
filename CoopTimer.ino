@@ -1,6 +1,4 @@
-/******************************************************************
- Created - 18.03.2021
- 
+/****************************************************************** Created - 18.03.2021 
  Project    : TIME CONTROLLER PROGRAM - cooptimer
  
  Libraries  : Wire.h //Included in Arduino IDE folder hardware/libraries/Wire
@@ -371,8 +369,8 @@ void setup()
       Setup_eeprom();
   
   //  Upload initial time on DS3231 - after setting time, disable this line in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
-      setTime(13, 23, 0, 18, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year
-      
+      //setTime(11, 16, 0, 18, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year  
+                  
   //  Get time from DS3231
       Setup_arduino_from_DS3231_time();
   
