@@ -60,6 +60,7 @@
       {
        KeyStatus = Input_read_keypad();
        #define MenuMax     8  //Defines number of menues
+       
        byte LineMax = Linemax_menu();
        switch (KeyStatus)            
        {
@@ -104,7 +105,6 @@
             switch(CurSelect)
             {
              case 0: CurSelect = 1;break;
-             case 1: CurSelect = 0;break;
             } 
            }
              if (Active_menu() == 2)                              //ACTIONS MENU 2
@@ -141,21 +141,19 @@
         CurSelect = 0;
         if (ValueChanged == 1)
         {
-         if (Active_menu() == 8) {Setup_arduino_from_menu_time();} //Set number of time menu here
+         if (Active_menu() == 8){Setup_arduino_from_menu_time();} //Set number of time menu here
          else
          {
           Eeprom_status = 2;
           Setup_eeprom();
-          Setup_light_timer();
-          Setup_door_timer();
-          Setup_nest_timer();
+          Setup_timer();
          }
          Line = Cur;
          Display_save(200);
          ValueChanged = 0;
         }
-         break;
-       }
+        break;
+       } 
       }
       return Pos;
      }

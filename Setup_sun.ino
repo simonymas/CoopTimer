@@ -18,7 +18,7 @@
    sunTimeLord.SunSet(sunSet);
    
      //Ajust to DST
-     if (DST == 1) //Determining if DST is activated. Variable defined in Setup_time()
+     if (DST == 1) //Determining if DST is active. Variable defined in Setup_time()
       {  
         ++sunRise[2];
         ++sunSet[2];

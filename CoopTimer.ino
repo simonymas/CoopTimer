@@ -1,7 +1,8 @@
-/****************************************************************** Created - 18.03.2021 
+/****************************************************************** Created - 2.04.2021 10:38
  Project    : TIME CONTROLLER PROGRAM - cooptimer
  
  Libraries  : Wire.h //Included in Arduino IDE folder hardware/libraries/Wire
+              Math.h //Included in Arduino IDE folder hardware/libraries/Wire
               TimeLib.h http://swfltek.com/arduino/timelord_library_deprecated.pdf
               TimeLord.h https://codebender.cc/library/TimeLord#TimeLord.h
               LiquidCrystal.h Included in Arduino IDE folder
@@ -53,8 +54,9 @@
       #include <Wire.h> 
       
   //  Time features
-      #include <TimeLib.h>
-      #include <TimeLord.h>
+      #include <math.h>      //Used for calculation of DoW (day of week)
+      #include <TimeLib.h>   //Handles time_t-numbers and arduino time features
+      #include <TimeLord.h>  //Calculates sunset, sunrise, etc.
                   
   //  LCD display
       #include  <LiquidCrystal.h>
@@ -148,6 +150,9 @@
 
       #define NestOpenPrecedeCivilTwilight_minute_address        33
       #define NestClosePrecedeSunSet_minute_address              34
+
+  //  Address to save DST-status (daylight saving time)
+      #define DSTLast_address                            35
       
 //DISTRIBUTION OF I2C ADRESSES
 
@@ -157,8 +162,8 @@
 //DECLARATION OF GLOBAL VARIABLES AND SETTING SOME VALUES (SETTINGS)
     
   //  Activate debugging messages in serial screen - set to true to debug (Warning: if all is activated, dynamic memory will overload)
-      const bool SerialDebugSetup = false;
-      const bool SerialDebugDisplay = false;
+      const bool SerialDebugSetup = true;
+      const bool SerialDebugDisplay = true;
       const bool SerialDebugControls = false;
       const bool SerialDebugTimers = false;
       const bool SerialDebugStatus = false;
@@ -369,12 +374,12 @@ void setup()
       Setup_eeprom();
   
   //  Upload initial time on DS3231 - after setting time, disable this line in code and upload again - otherwise the time will be reset to preset values entered below every time arduino resets!
-      //setTime(11, 16, 0, 18, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year  
+      //setTime(9, 37, 30, 31, 3, 21); Setup_DS3231_from_arduino_time(); // Key: Hour, minute, second, day, month, year  
                   
   //  Get time from DS3231
       Setup_arduino_from_DS3231_time();
   
-  //  Setup arduino to reset at 00:00:00 the following day
+  //  Setup arduino to reset at 01:00:00 the following day
       Setup_reset();
    
   //  Display update message to indicate, that reset has been done
@@ -383,10 +388,8 @@ void setup()
   //  Calculate time of sunrise and sunset
       Setup_sun();
  
-  //  Set timers and light
-      Setup_light_timer();
-      Setup_door_timer();
-      Setup_nest_timer();
+  //  Set present values of timers
+      Setup_timer();
 }
 
 //PROGRAM - runs in loop - functions defined in other tabs
@@ -404,10 +407,10 @@ void loop()
       
       Input_keypad();
 
-  //  Refresh LCD to show current menu
+  //  Refresh information on LCD to show current menu
+      Setup_arduino_from_DS3231_time();
       Display_menu();
 }
-
 
 //GENERAL UTILITY FUNCTIONS
 
